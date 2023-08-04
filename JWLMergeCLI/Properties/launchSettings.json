@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "JWLMergeCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "UserdataBackup_08-02-2023_JHWH.jwlibrary UserDataBackup_08-02-2023_WW-SURFACE.jwlibrary",
+      "workingDirectory": "C:\\Users\\Wes\\OneDrive\\Documents\\JW Lib Backups\\",
+      "sqlDebugging": true
+    }
+  }
+}

@@ -23,7 +23,7 @@ internal sealed class MainApp
         backupFileService.ProgressEvent += BackupFileServiceProgress;
             
         var backup = backupFileService.Merge(args.BackupFiles);
-        string outputFileName = args.OutputFilePath ?? $"{backup.Manifest.Name}.jwlibrary";
+        string outputFileName = string.IsNullOrEmpty(args.OutputFilePath) ? $"{backup.Manifest.Name}.jwlibrary" : args.OutputFilePath;
         backupFileService.WriteNewDatabase(backup, outputFileName, args.BackupFiles[0]);
 
         var logMessage = $"{args.BackupFiles.Length} backup files merged to {outputFileName}";

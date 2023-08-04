@@ -460,6 +460,7 @@ internal sealed class Merger
         destination.Title = source.Title;
         destination.Content = source.Content;
         destination.LastModified = source.LastModified;
+        destination.Created = source.Created;
     }
 
     private void OnProgressEvent(string message)

@@ -169,7 +169,7 @@ internal sealed class DataAccessLayer
     {
         using var command = connection.CreateCommand();
 
-        command.CommandText = "delete from LastModified; insert into LastModified default values";
+        command.CommandText = "UPDATE LastModified SET LastModified = datetime('now')";
         Log.Logger.Debug($"SQL: {command.CommandText}");
 
         command.ExecuteNonQuery();
@@ -263,6 +263,7 @@ internal sealed class DataAccessLayer
             LocationId = ReadNullableInt(reader, "LocationId"),
             Title = ReadNullableString(reader, "Title"),
             Content = ReadNullableString(reader, "Content"),
+            Created = ReadNullableString(reader, "Created"),
             LastModified = ReadString(reader, "LastModified"),
             BlockType = ReadInt(reader, "BlockType"),
             BlockIdentifier = ReadNullableInt(reader, "BlockIdentifier"),
@@ -276,7 +277,7 @@ internal sealed class DataAccessLayer
             TagId = ReadInt(reader, "TagId"),
             Type = ReadInt(reader, "Type"),
             Name = ReadString(reader, "Name"),
-            ImageFileName = ReadNullableString(reader, "ImageFilename"),    // added in db v7 April 2020
+ //           ImageFileName = ReadNullableString(reader, "ImageFilename"),    // added in db v7 April 2020. Removed in db v13 7/28/2023
         };
     }
 

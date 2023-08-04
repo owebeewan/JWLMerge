@@ -21,8 +21,8 @@ public class Tag
     /// <summary>
     /// The optional image file name.
     /// </summary>
-    /// <remarks>Added in db ver 7 April 2020.</remarks>
-    public string? ImageFileName { get; set; }
+    /// <remarks>Added in db ver 7 April 2020.. Removed in db v13 7/28/2023</remarks>
+ //   public string? ImageFileName { get; set; }
 
     public Tag Clone()
     {

@@ -24,7 +24,7 @@ namespace JWLMerge.BackupFileServices;
 public sealed class BackupFileService : IBackupFileService
 {
     private const int ManifestVersionSupported = 1;
-    private const int DatabaseVersionSupported = 8;
+    private const int DatabaseVersionSupported = 13;
     private const string ManifestEntryName = "manifest.json";
     private const string DatabaseEntryName = "userData.db";
 
