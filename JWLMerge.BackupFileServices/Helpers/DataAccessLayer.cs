@@ -169,7 +169,7 @@ internal sealed class DataAccessLayer
     {
         using var command = connection.CreateCommand();
 
-        command.CommandText = "delete from LastModified; insert into LastModified default values";
+        command.CommandText = "UPDATE LastModified SET LastModified = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')";
         Log.Logger.Debug($"SQL: {command.CommandText}");
 
         command.ExecuteNonQuery();
