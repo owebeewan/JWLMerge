@@ -247,7 +247,7 @@ internal sealed class DataAccessLayer
             Track = ReadNullableInt(reader, "Track"),
             IssueTagNumber = ReadInt(reader, "IssueTagNumber"),
             KeySymbol = ReadString(reader, "KeySymbol"),
-            MepsLanguage = ReadInt(reader, "MepsLanguage"),
+            MepsLanguage = ReadNullableInt(reader, "MepsLanguage"),
             Type = ReadInt(reader, "Type"),
             Title = ReadNullableString(reader, "Title"),
         };
@@ -276,7 +276,6 @@ internal sealed class DataAccessLayer
             TagId = ReadInt(reader, "TagId"),
             Type = ReadInt(reader, "Type"),
             Name = ReadString(reader, "Name"),
-            ImageFileName = ReadNullableString(reader, "ImageFilename"),    // added in db v7 April 2020
         };
     }
 

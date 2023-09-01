@@ -24,7 +24,7 @@ namespace JWLMerge.BackupFileServices;
 public sealed class BackupFileService : IBackupFileService
 {
     private const int ManifestVersionSupported = 1;
-    private const int DatabaseVersionSupported = 8;
+    private const int DatabaseVersionSupported = 14;
     private const string ManifestEntryName = "manifest.json";
     private const string DatabaseEntryName = "userData.db";
 
@@ -470,7 +470,7 @@ public sealed class BackupFileService : IBackupFileService
         BackupFile originalBackupFile,
         IEnumerable<BibleNote> notes,
         string bibleKeySymbol,
-        int mepsLanguageId, 
+        int? mepsLanguageId, 
         ImportBibleNotesParams options)
     {
         if (originalBackupFile == null)

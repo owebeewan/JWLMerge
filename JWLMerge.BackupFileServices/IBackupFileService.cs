@@ -119,7 +119,7 @@ public interface IBackupFileService
         BackupFile originalBackupFile,
         IEnumerable<BibleNote> notes,
         string bibleKeySymbol,
-        int mepsLanguageId, 
+        int? mepsLanguageId, 
         ImportBibleNotesParams options);
 
     ExportBibleNotesResult ExportBibleNotes(BackupFile backupFile, string bibleNotesExportFilePath, IExportToFileService exportService);

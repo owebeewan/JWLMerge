@@ -8,8 +8,6 @@ namespace JWLMerge.Services;
 // ReSharper disable once ClassNeverInstantiated.Global
 internal sealed class FileOpenSaveService : IFileOpenSaveService
 {
-    private static string? SaveDirectory { get; set; }
-
     private static string? ImportDirectory { get; set; }
 
     private static string? ExportDirectory { get; set; }
@@ -86,12 +84,14 @@ internal sealed class FileOpenSaveService : IFileOpenSaveService
             AddExtension = true,
             Title = title,
             Filter = "JW Library backup file (*.jwlibrary)|*.jwlibrary",
-            InitialDirectory = SaveDirectory ?? GetDefaultSaveFolder(),
+            InitialDirectory = Properties.Settings.Default.SaveDirectory ?? GetDefaultSaveFolder(),
+            FileName = $"UserdataBackup_{DateTime.Now:yyyy-MM-dd}_JWLMerge",
         };
             
         if (saveFileDialog.ShowDialog() == true)
         {
-            SaveDirectory = Path.GetDirectoryName(saveFileDialog.FileName);
+            Properties.Settings.Default.SaveDirectory = Path.GetDirectoryName(saveFileDialog.FileName);
+            Properties.Settings.Default.Save();
             return saveFileDialog.FileName;
         }
             

@@ -43,7 +43,7 @@ public class Location
     /// <summary>
     /// The MEPS identifier for the publication language.
     /// </summary>
-    public int MepsLanguage { get; set; }
+    public int? MepsLanguage { get; set; }
 
     /// <summary>
     /// The type. 

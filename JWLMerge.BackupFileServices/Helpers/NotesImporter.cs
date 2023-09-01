@@ -11,7 +11,7 @@ internal sealed class NotesImporter
 {
     private readonly Database _targetDatabase;
     private readonly string _bibleKeySymbol;
-    private readonly int _mepsLanguageId;
+    private readonly int? _mepsLanguageId;
     private readonly ImportBibleNotesParams _options;
     private int _maxNoteId;
     private int _maxTagMapId;
@@ -23,7 +23,7 @@ internal sealed class NotesImporter
     public NotesImporter(
         Database targetDatabase, 
         string bibleKeySymbol, 
-        int mepsLanguageId,
+        int? mepsLanguageId,
         ImportBibleNotesParams options)
     {
         _targetDatabase = targetDatabase;

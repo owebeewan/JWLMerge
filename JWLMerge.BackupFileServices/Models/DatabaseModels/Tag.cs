@@ -18,12 +18,6 @@ public class Tag
     /// </summary>
     public string Name { get; set; } = null!;
 
-    /// <summary>
-    /// The optional image file name.
-    /// </summary>
-    /// <remarks>Added in db ver 7 April 2020.</remarks>
-    public string? ImageFileName { get; set; }
-
     public Tag Clone()
     {
         return (Tag)MemberwiseClone();

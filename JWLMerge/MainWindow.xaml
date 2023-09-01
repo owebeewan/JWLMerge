@@ -28,7 +28,7 @@
         <DataTemplate DataType="{x:Type models:JwLibraryFile}">
             <materialDesign:Card
                 Width="220"
-                Height="245"
+                Height="260"
                 Margin="20,20,0,0"
                 Padding="10"
                 IsEnabled="{Binding Path=DataContext.IsNotBusy, ElementName=JwlMergeWindow}">
