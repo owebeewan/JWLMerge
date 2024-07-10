@@ -129,9 +129,7 @@ internal sealed class DetailViewModel : ObservableObject
 
     public bool IsNotesItemSelected => SelectedDataType?.DataType == JwLibraryFileDataTypes.Note;
 
-#pragma warning disable U2U1011 // Return types should be specific
-    private static IEnumerable ManifestAsItemsSource(Manifest? manifest)
-#pragma warning restore U2U1011 // Return types should be specific
+    private static List<KeyValuePair<string, string>> ManifestAsItemsSource(Manifest? manifest)
     {
         var result = new List<KeyValuePair<string, string>>();
 

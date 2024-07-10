@@ -31,30 +31,30 @@ internal sealed class NotesImporter
         _mepsLanguageId = mepsLanguageId;
         _options = options;
 
-        _maxNoteId = !_targetDatabase.Notes.Any()
+        _maxNoteId = _targetDatabase.Notes.Count == 0
             ? 0 
             : _targetDatabase.Notes.Max(x => x.NoteId);
 
-        _maxTagMapId = !_targetDatabase.TagMaps.Any()
+        _maxTagMapId = _targetDatabase.TagMaps.Count == 0
             ? 0
             : _targetDatabase.TagMaps.Max(x => x.TagMapId);
 
-        _maxLocationId = !_targetDatabase.Locations.Any()
+        _maxLocationId = _targetDatabase.Locations.Count == 0
             ? 0
             : _targetDatabase.Locations.Max(x => x.LocationId);
 
-        _maxUserMarkId = !_targetDatabase.UserMarks.Any()
+        _maxUserMarkId = _targetDatabase.UserMarks.Count == 0
             ? 0
             : _targetDatabase.UserMarks.Max(x => x.UserMarkId);
 
-        _maxBlockRangeId = !_targetDatabase.BlockRanges.Any()
+        _maxBlockRangeId = _targetDatabase.BlockRanges.Count == 0
             ? 0
             : _targetDatabase.BlockRanges.Max(x => x.BlockRangeId);
 
         if (_options.TagId > 0)
         {
             var tagEntries = _targetDatabase.TagMaps.Where(x => x.TagId == _options.TagId).ToArray();
-            if (tagEntries.Any())
+            if (tagEntries.Length != 0)
             {
                 _tagMapPositionToUse = tagEntries.Max(x => x.Position) + 1;
             }

@@ -25,7 +25,7 @@ internal static class VersionDetection
                 if (latestVersionUri != null)
                 {
                     var segments = latestVersionUri.Segments;
-                    if (segments.Any())
+                    if (segments.Length != 0)
                     {
                         version = segments[^1];
                     }

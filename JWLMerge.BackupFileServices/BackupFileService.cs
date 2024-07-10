@@ -82,21 +82,15 @@ public sealed class BackupFileService : IBackupFileService
     /// <inheritdoc />
     public void RemoveFavourites(BackupFile backup)
     {
-        if (backup == null)
-        {
-            throw new ArgumentNullException(nameof(backup));
-        }
-            
+        ArgumentNullException.ThrowIfNull(backup);
+
         backup.Database.TagMaps.RemoveAll(x => x.TagId == 1);
     }
 
     /// <inheritdoc />
     public int RedactNotes(BackupFile backup)
     {
-        if (backup == null)
-        {
-            throw new ArgumentNullException(nameof(backup));
-        }
+        ArgumentNullException.ThrowIfNull(backup, nameof(backup));
 
         var redactService = new RedactService();
 
@@ -134,10 +128,7 @@ public sealed class BackupFileService : IBackupFileService
         bool removeAssociatedUnderlining,
         bool removeAssociatedTags)
     {
-        if (backup == null)
-        {
-            throw new ArgumentNullException(nameof(backup));
-        }
+        ArgumentNullException.ThrowIfNull(backup);
 
         tagIds ??= Array.Empty<int>();
 
@@ -191,10 +182,7 @@ public sealed class BackupFileService : IBackupFileService
     /// <inheritdoc />
     public int RemoveUnderliningByColour(BackupFile backup, int[]? colorIndexes, bool removeAssociatedNotes)
     {
-        if (backup == null)
-        {
-            throw new ArgumentNullException(nameof(backup));
-        }
+        ArgumentNullException.ThrowIfNull(backup);
 
         colorIndexes ??= Array.Empty<int>();
 
@@ -220,10 +208,7 @@ public sealed class BackupFileService : IBackupFileService
         bool anyPublication, 
         bool removeAssociatedNotes)
     {
-        if (backup == null)
-        {
-            throw new ArgumentNullException(nameof(backup));
-        }
+        ArgumentNullException.ThrowIfNull(backup);
 
         if (string.IsNullOrEmpty(publicationSymbol) && !anyPublication)
         {
@@ -258,10 +243,7 @@ public sealed class BackupFileService : IBackupFileService
         string newDatabaseFilePath, 
         string originalJwlibraryFilePathForSchema)
     {
-        if (backup == null)
-        {
-            throw new ArgumentNullException(nameof(backup));
-        }
+        ArgumentNullException.ThrowIfNull(backup);
 
         ProgressMessage("Checking validity");
         backup.Database.CheckValidity();
@@ -312,10 +294,7 @@ public sealed class BackupFileService : IBackupFileService
     /// <inheritdoc />
     public int RemoveTags(Database database)
     {
-        if (database == null)
-        {
-            throw new ArgumentNullException(nameof(database));
-        }
+        ArgumentNullException.ThrowIfNull(database);
 
         // clear all but the first tag (which will be the "favourites")...
         var tagCount = database.Tags.Count;
@@ -334,10 +313,7 @@ public sealed class BackupFileService : IBackupFileService
     /// <inheritdoc />
     public int RemoveBookmarks(Database database)
     {
-        if (database == null)
-        {
-            throw new ArgumentNullException(nameof(database));
-        }
+        ArgumentNullException.ThrowIfNull(database);
 
         var count = database.Bookmarks.Count;
         database.Bookmarks.Clear();
@@ -347,10 +323,7 @@ public sealed class BackupFileService : IBackupFileService
     /// <inheritdoc />
     public int RemoveInputFields(Database database)
     {
-        if (database == null)
-        {
-            throw new ArgumentNullException(nameof(database));
-        }
+        ArgumentNullException.ThrowIfNull(database);
 
         var count = database.InputFields.Count;
         database.InputFields.Clear();
@@ -360,10 +333,7 @@ public sealed class BackupFileService : IBackupFileService
     /// <inheritdoc />
     public int RemoveNotes(Database database)
     {
-        if (database == null)
-        {
-            throw new ArgumentNullException(nameof(database));
-        }
+        ArgumentNullException.ThrowIfNull(database);
 
         var count = database.Notes.Count;
         database.Notes.Clear();
@@ -373,12 +343,9 @@ public sealed class BackupFileService : IBackupFileService
     /// <inheritdoc />
     public int RemoveUnderlining(Database database)
     {
-        if (database == null)
-        {
-            throw new ArgumentNullException(nameof(database));
-        }
+        ArgumentNullException.ThrowIfNull(database);
 
-        if (!database.Notes.Any())
+        if (database.Notes.Count == 0)
         {
             var count = database.UserMarks.Count;
             database.UserMarks.Clear();
@@ -411,10 +378,7 @@ public sealed class BackupFileService : IBackupFileService
     /// <inheritdoc />
     public BackupFile Merge(IReadOnlyCollection<BackupFile> files)
     {
-        if (files == null)
-        {
-            throw new ArgumentNullException(nameof(files));
-        }
+        ArgumentNullException.ThrowIfNull(files);
 
         ProgressMessage($"Merging {files.Count} backup files");
 
@@ -438,10 +402,7 @@ public sealed class BackupFileService : IBackupFileService
     /// <inheritdoc />
     public BackupFile Merge(IReadOnlyCollection<string> files)
     {
-        if (files == null)
-        {
-            throw new ArgumentNullException(nameof(files));
-        }
+        ArgumentNullException.ThrowIfNull(files);
 
         ProgressMessage($"Merging {files.Count} backup files");
 
@@ -473,16 +434,10 @@ public sealed class BackupFileService : IBackupFileService
         int? mepsLanguageId, 
         ImportBibleNotesParams options)
     {
-        if (originalBackupFile == null)
-        {
-            throw new ArgumentNullException(nameof(originalBackupFile));
-        }
+        ArgumentNullException.ThrowIfNull(originalBackupFile);
 
-        if (notes == null)
-        {
-            throw new ArgumentNullException(nameof(notes));
-        }
-            
+        ArgumentNullException.ThrowIfNull(notes);
+
         ProgressMessage("Importing Bible notes");
 
         var newManifest = UpdateManifest(originalBackupFile.Manifest);
@@ -588,7 +543,7 @@ public sealed class BackupFileService : IBackupFileService
         var noteIdsToRemove = new HashSet<int>();
         var tagMapIdsToRemove = new HashSet<int>();
 
-        if (userMarkIdsToRemove.Any())
+        if (userMarkIdsToRemove.Count != 0)
         {
             foreach (var note in database.Notes)
             {

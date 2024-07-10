@@ -402,7 +402,7 @@ internal sealed class MainViewModel : ObservableObject
             return;
         }
             
-        if (!file.BackupFile.Database.UserMarks.Any())
+        if (file.BackupFile.Database.UserMarks.Count == 0)
         {
             _snackbarService.Enqueue("There is no underlining in the backup file!");
             return;
@@ -411,7 +411,7 @@ internal sealed class MainViewModel : ObservableObject
         var colors = ColourHelper.GetHighlighterColoursInUse(file.BackupFile.Database.UserMarks, false);
 
         var result = await _dialogService.GetColourSelectionForUnderlineRemovalAsync(colors);
-        if (result.ColourIndexes == null || !result.ColourIndexes.Any())
+        if (result.ColourIndexes == null || result.ColourIndexes.Length == 0)
         {
             return;
         }
@@ -474,7 +474,7 @@ internal sealed class MainViewModel : ObservableObject
 
         var result = await _dialogService.GetTagSelectionForNotesRemovalAsync(tags, includeUntaggedNotes);
 
-        if (!result.RemoveUntaggedNotes && (result.TagIds == null || !result.TagIds.Any()))
+        if (!result.RemoveUntaggedNotes && (result.TagIds == null || result.TagIds.Length == 0))
         {
             return;
         }
@@ -532,7 +532,7 @@ internal sealed class MainViewModel : ObservableObject
         var file = GetFile(filePath);
 
         var notes = file?.BackupFile.Database.Notes;
-        if (notes == null || !notes.Any())
+        if (notes == null || notes.Count == 0)
         {
             _snackbarService.Enqueue("No notes found");
             return;

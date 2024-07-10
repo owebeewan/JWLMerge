@@ -1,4 +1,6 @@
-﻿namespace JWLMerge.ImportExportServices.Models;
+﻿using System.Globalization;
+
+namespace JWLMerge.ImportExportServices.Models;
 
 public class BibleNoteForImportExport
 {
@@ -43,7 +45,7 @@ public class BibleNoteForImportExport
 
             if (VerseNumber == null)
             {
-                return ChapterNumber.ToString()!;
+                return $"{ChapterNumber}";
             }
 
             return $"{ChapterNumber}:{VerseNumber}";

@@ -127,7 +127,7 @@ internal sealed class Cleaner
         int removed = 0;
             
         var locations = _database.Locations;
-        if (locations.Any())
+        if (locations.Count != 0)
         {
             var locationIds = GetLocationIdsInUse();
 
@@ -150,7 +150,7 @@ internal sealed class Cleaner
         var removed = 0;
 
         var tagMaps = _database.TagMaps;
-        if (tagMaps.Any())
+        if (tagMaps.Count != 0)
         {
             var tagIds = GetValidTagIds();
             var noteIds = GetValidNoteIds();
@@ -181,7 +181,7 @@ internal sealed class Cleaner
         int removed = 0;
 
         var ranges = _database.BlockRanges;
-        if (ranges.Any())
+        if (ranges.Count != 0)
         {
             var userMarkIdsFound = new HashSet<int>();
             var userMarkIds = GetValidUserMarkIds();

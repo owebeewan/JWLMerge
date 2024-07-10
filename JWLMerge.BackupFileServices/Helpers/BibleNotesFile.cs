@@ -17,7 +17,8 @@ public class BibleNotesFile
     private Lazy<string[]> FileContents { get; }
 
     private readonly Lazy<PubNotesFileSection[]> _sections;
-       
+    private static readonly char[] separator = new[] { ':' };
+
     public BibleNotesFile(string path)
     {
         FileContents = new Lazy<string[]>(() => FileContentsFactory(path));
@@ -37,7 +38,7 @@ public class BibleNotesFile
     {
         var sections = _sections.Value.Where(x => x.SymbolAndLanguage == symbolAndLanguage).ToArray();
 
-        if (!sections.Any())
+        if (sections.Length == 0)
         {
             yield break;
         }
@@ -244,12 +245,12 @@ public class BibleNotesFile
     {
         var trimmed = line.Trim();
 
-        if (!trimmed.StartsWith("[", StringComparison.Ordinal) || !trimmed.EndsWith("]", StringComparison.Ordinal))
+        if (!trimmed.StartsWith('[') || !trimmed.EndsWith(']'))
         {
             return null;
         }
 
-        var digits = trimmed.TrimStart('[').TrimEnd(']').Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+        var digits = trimmed.TrimStart('[').TrimEnd(']').Split(separator, StringSplitOptions.RemoveEmptyEntries);
         if (digits.Length < 3 || digits.Length > 6)
         {
             return null;

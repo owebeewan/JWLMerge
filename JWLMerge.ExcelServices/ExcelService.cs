@@ -39,7 +39,7 @@ public class ExcelService : IExportToFileService
             startRow = lastRow + 2;
         }
 
-        if (notes == null || !notes.Any())
+        if (notes == null || notes.Count == 0)
         {
             result.NoNotesFound = true;
             return result;

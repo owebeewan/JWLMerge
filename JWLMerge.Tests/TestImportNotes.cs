@@ -102,10 +102,8 @@ in the note.";
         Assert.IsTrue(result.BibleNotesUpdated == 0);
     }
 
-    private static IEnumerable<BibleNote> CreateMockBibleNotes()
+    private static List<BibleNote> CreateMockBibleNotes() => new()
     {
-        return new List<BibleNote>
-        {
             new()
             {
                 BookChapterAndVerse = new BibleBookChapterAndVerse(1, 1, 1),
@@ -119,5 +117,4 @@ in the note.";
                 NoteContent = "My notes go here",
             },
         };
-    }
 }

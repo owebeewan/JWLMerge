@@ -96,10 +96,7 @@ public class Database
         Note value,
         TagMap? tagMap)
     {
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
 
         Notes.Add(value);
 
@@ -132,10 +129,7 @@ public class Database
 
     public void AddBlockRangeAndUpdateIndex(BlockRange value)
     {
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
 
         BlockRanges.Add(value);
 
@@ -153,10 +147,7 @@ public class Database
 
     public void AddUserMarkAndUpdateIndex(UserMark value)
     {
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
 
         UserMarks.Add(value);
 
@@ -184,10 +175,7 @@ public class Database
 
     public void AddLocationAndUpdateIndex(Location value)
     {
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
 
         Locations.Add(value);
 
@@ -293,10 +281,7 @@ public class Database
 
     public Location? FindLocationByValues(Location locationValues)
     {
-        if (locationValues == null)
-        {
-            throw new ArgumentNullException(nameof(locationValues));
-        }
+        ArgumentNullException.ThrowIfNull(locationValues);
 
         var key = GetLocationByValueKey(locationValues);
         return _locationsValueIndex.Value.TryGetValue(key, out var location) ? location : null;
@@ -597,17 +582,13 @@ public class Database
 
             var key = $"{loc.KeySymbol}|{loc.IssueTagNumber}|{loc.MepsLanguage}|{loc.DocumentId.Value}|{loc.Track.Value}|{loc.Type}";
 
-            if (keys.Contains(key))
+            if (!keys.Add(key))
             {
                 // found a duplicate that will cause a constraint exception.
                 ++fixupCount;
                 Locations.RemoveAt(n);
 
                 Log.Logger.Error($"Removed duplicate location {loc.LocationId}");
-            }
-            else
-            {
-                keys.Add(key);
             }
         }
 
