@@ -23,7 +23,7 @@ internal static class ArgsHelper
 
         var result = new CommandLineArgs();
         var inputFiles = new List<string>();
-        var outputFilePath = string.Empty;
+        string? outputFilePath = null;
 
         foreach (var a in args)
         {
@@ -55,7 +55,7 @@ internal static class ArgsHelper
         }
 
         result.OutputFilePath = outputFilePath;
-        result.BackupFiles = inputFiles.ToArray();
+        result.BackupFiles = [.. inputFiles];
 
         return result;
     }
