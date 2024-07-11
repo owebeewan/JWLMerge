@@ -36,10 +36,10 @@ md Installer\Staging
 
 ECHO.
 ECHO Copying JWLMergeCLI items into staging area
-xcopy JWLMergeCLI\bin\Release\net6.0\publish\*.* Installer\Staging /q /s /y /d
+xcopy JWLMergeCLI\bin\Release\net8.0\publish\*.* Installer\Staging /q /s /y /d
 
 ECHO Copying JWLMerge items into staging area
-xcopy JWLMerge\bin\Release\net6.0-windows\publish\*.* Installer\Staging /q /s /y /d
+xcopy JWLMerge\bin\Release\net8.0-windows\publish\*.* Installer\Staging /q /s /y /d
 
 ECHO.
 ECHO Creating installer
