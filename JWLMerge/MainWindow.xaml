@@ -218,7 +218,7 @@
                         Width="110"
                         Margin="0,0,10,0"
                         Command="{Binding UpdateCommand}"
-                        Style="{StaticResource MaterialDesignRaisedAccentButton}"
+                        Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
                         ToolTip="New version available!"
                         Visibility="{Binding Path=IsNewVersionAvailable, Converter={StaticResource BoolToVis}, Mode=OneWay}">
                         UPDATE

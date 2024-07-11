@@ -18,7 +18,7 @@
         <Style x:Key="BtnStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedLightButton}">
             <Setter Property="Width" Value="125"/>
         </Style>
-        <Style x:Key="OkBtnStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedAccentButton}">
+        <Style x:Key="OkBtnStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedSecondaryButton}">
             <Setter Property="Margin" Value="0,0,10,0"/>
             <Setter Property="Width" Value="125"/>
         </Style>
