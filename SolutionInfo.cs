@@ -2,8 +2,8 @@
 
 [assembly: AssemblyCompany("Antony Corbett")]
 [assembly: AssemblyProduct("JWLMerge")]
-[assembly: AssemblyCopyright("Copyright © 2019, 2023")]
+[assembly: AssemblyCopyright("Copyright © 2019, 2023, 2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-[assembly: AssemblyVersion("2.2.0.1")]
+[assembly: AssemblyVersion("2.2.1.0")]
