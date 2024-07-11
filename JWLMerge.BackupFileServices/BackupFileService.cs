@@ -29,7 +29,7 @@ public sealed class BackupFileService : IBackupFileService
     private const string DatabaseEntryName = "userData.db";
 
     private readonly Merger _merger = new();
-        
+
     public BackupFileService()
     {
         _merger.ProgressEvent += MergerProgressEvent;
@@ -44,7 +44,7 @@ public sealed class BackupFileService : IBackupFileService
         {
             throw new ArgumentNullException(nameof(backupFilePath));
         }
-            
+
         if (!File.Exists(backupFilePath))
         {
             throw new BackupFileServicesException($"File does not exist: {backupFilePath}");
@@ -122,9 +122,9 @@ public sealed class BackupFileService : IBackupFileService
 
     /// <inheritdoc />
     public int RemoveNotesByTag(
-        BackupFile backup, 
-        int[]? tagIds, 
-        bool removeUntaggedNotes, 
+        BackupFile backup,
+        int[]? tagIds,
+        bool removeUntaggedNotes,
         bool removeAssociatedUnderlining,
         bool removeAssociatedTags)
     {
@@ -187,7 +187,7 @@ public sealed class BackupFileService : IBackupFileService
         colorIndexes ??= Array.Empty<int>();
 
         var userMarkIdsToRemove = new HashSet<int>();
-            
+
         foreach (var mark in backup.Database.UserMarks)
         {
             if (colorIndexes.Contains(mark.ColorIndex))
@@ -201,11 +201,11 @@ public sealed class BackupFileService : IBackupFileService
 
     /// <inheritdoc />
     public int RemoveUnderliningByPubAndColor(
-        BackupFile backup, 
-        int colorIndex, 
-        bool anyColor, 
+        BackupFile backup,
+        int colorIndex,
+        bool anyColor,
         string? publicationSymbol,
-        bool anyPublication, 
+        bool anyPublication,
         bool removeAssociatedNotes)
     {
         ArgumentNullException.ThrowIfNull(backup);
@@ -216,7 +216,7 @@ public sealed class BackupFileService : IBackupFileService
         }
 
         var userMarkIdsToRemove = new HashSet<int>();
-            
+
         foreach (var mark in backup.Database.UserMarks)
         {
             if (ShouldRemoveUnderlining(mark, backup.Database, colorIndex, anyColor, publicationSymbol, anyPublication))
@@ -239,8 +239,8 @@ public sealed class BackupFileService : IBackupFileService
 
     /// <inheritdoc />
     public void WriteNewDatabase(
-        BackupFile backup, 
-        string newDatabaseFilePath, 
+        BackupFile backup,
+        string newDatabaseFilePath,
         string originalJwlibraryFilePathForSchema)
     {
         ArgumentNullException.ThrowIfNull(backup);
@@ -273,7 +273,7 @@ public sealed class BackupFileService : IBackupFileService
                                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                             }));
                 }
-                    
+
                 AddDatabaseEntryToArchive(archive, backup.Database, tmpDatabaseFileName);
             }
             finally
@@ -286,11 +286,11 @@ public sealed class BackupFileService : IBackupFileService
         using var fileStream = new FileStream(newDatabaseFilePath, FileMode.Create);
 
         ProgressMessage("Finishing");
-                    
+
         memoryStream.Seek(0, SeekOrigin.Begin);
         memoryStream.CopyTo(fileStream);
     }
-        
+
     /// <inheritdoc />
     public int RemoveTags(Database database)
     {
@@ -304,9 +304,9 @@ public sealed class BackupFileService : IBackupFileService
         }
 
         database.TagMaps.Clear();
-            
-        return tagCount > 1 
-            ? tagCount - 1 
+
+        return tagCount > 1
+            ? tagCount - 1
             : tagCount;
     }
 
@@ -421,7 +421,7 @@ public sealed class BackupFileService : IBackupFileService
         // just pick the first manifest as the basis for the 
         // manifest in the final merged file...
         var newManifest = UpdateManifest(originals[0].Manifest);
-            
+
         var mergedDatabase = MergeDatabases(originals);
         return new BackupFile(newManifest, mergedDatabase, "unknown.jwlibrary");
     }
@@ -431,7 +431,7 @@ public sealed class BackupFileService : IBackupFileService
         BackupFile originalBackupFile,
         IEnumerable<BibleNote> notes,
         string bibleKeySymbol,
-        int? mepsLanguageId, 
+        int? mepsLanguageId,
         ImportBibleNotesParams options)
     {
         ArgumentNullException.ThrowIfNull(originalBackupFile);
@@ -442,8 +442,8 @@ public sealed class BackupFileService : IBackupFileService
 
         var newManifest = UpdateManifest(originalBackupFile.Manifest);
         var notesImporter = new NotesImporter(
-            originalBackupFile.Database, 
-            bibleKeySymbol, 
+            originalBackupFile.Database,
+            bibleKeySymbol,
             mepsLanguageId,
             options);
 
@@ -627,8 +627,8 @@ public sealed class BackupFileService : IBackupFileService
     private Database ReadDatabase(ZipArchive archive, string databaseName)
     {
         ProgressMessage($"Reading database {databaseName}");
-            
-        var databaseEntry = archive.Entries.FirstOrDefault(x => x.Name.Equals(databaseName, StringComparison.OrdinalIgnoreCase)) 
+
+        var databaseEntry = archive.Entries.FirstOrDefault(x => x.Name.Equals(databaseName, StringComparison.OrdinalIgnoreCase))
                             ?? throw new BackupFileServicesException("Could not find database entry in jwlibrary file");
 
         Database result;
@@ -672,17 +672,17 @@ public sealed class BackupFileService : IBackupFileService
     private Manifest ReadManifest(string filename, ZipArchive archive)
     {
         ProgressMessage("Reading manifest");
-            
+
         var manifestEntry = archive.Entries.FirstOrDefault(x => x.Name.Equals(ManifestEntryName, StringComparison.OrdinalIgnoreCase))
             ?? throw new BackupFileServicesException($"Could not find manifest entry in jwlibrary file: {filename}");
-        
+
         using var stream = new StreamReader(manifestEntry.Open());
 
         var fileContents = stream.ReadToEnd();
 
         Log.Logger.Debug("Parsing manifest");
         dynamic data = JObject.Parse(fileContents);
-                
+
         int manifestVersion = data.version ?? 0;
         if (!SupportManifestVersion(manifestVersion))
         {
@@ -781,12 +781,12 @@ public sealed class BackupFileService : IBackupFileService
     }
 
     private void AddDatabaseEntryToArchive(
-        ZipArchive archive, 
-        Database database, 
+        ZipArchive archive,
+        Database database,
         string originalDatabaseFilePathForSchema)
     {
         ProgressMessage("Adding database to archive");
-            
+
         var tmpDatabaseFile = CreateTemporaryDatabaseFile(database, originalDatabaseFilePathForSchema);
         try
         {
@@ -807,7 +807,7 @@ public sealed class BackupFileService : IBackupFileService
     {
         OnProgressEvent(new ProgressEventArgs(message));
     }
-        
+
     private void ProgressMessage(string logMessage)
     {
         Log.Logger.Information(logMessage);

@@ -8,7 +8,7 @@ namespace JWLMerge.BackupFileServices.Models.DatabaseModels;
 
 public class Database
 {
-    private readonly Dictionary<int, int> _bookmarkSlots = new();
+    private readonly Dictionary<int, int> _bookmarkSlots = [];
         
     private Lazy<Dictionary<Guid, Note>> _notesGuidIndex = null!;
     private Lazy<Dictionary<int, Note>> _notesIdIndex = null!;

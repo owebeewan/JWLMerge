@@ -92,21 +92,6 @@ CREATE TABLE "Note" (
                 FOREIGN KEY(LocationId) REFERENCES Location(LocationId)
             );
 
-CREATE TABLE PlaylistMedia(
-                PlaylistMediaId     INTEGER NOT NULL PRIMARY KEY,
-                MediaType           INTEGER NOT NULL,
-                Label               TEXT,
-                Filename            TEXT UNIQUE,
-                LocationId          INTEGER,
-                FOREIGN KEY(LocationId) REFERENCES Location(LocationId),
-                CONSTRAINT MediaType_LocationId UNIQUE(MediaType, LocationId),
-                CHECK(
-                    (LocationId IS NULL AND Filename IS NOT NULL AND Label IS NOT NULL) OR 
-                    (LocationId IS NOT NULL AND Filename IS NULL AND Label IS NULL) OR 
-                    (LocationId IS NOT NULL AND Filename IS NOT NULL)),
-                CHECK(MediaType IN(1, 2, 3))
-            );
-
 CREATE TABLE PlaylistItem(
                 PlaylistItemId               INTEGER NOT NULL PRIMARY KEY,
                 Label                        TEXT NOT NULL,
@@ -122,20 +107,58 @@ CREATE TABLE PlaylistItem(
                 CHECK(EndAction IN(0, 1, 2, 3))
             );
 
-CREATE TABLE PlaylistItemChild(
-                PlaylistItemChildId                 INTEGER NOT NULL PRIMARY KEY,
-                BaseDurationTicks                   INTEGER NOT NULL,
-                MarkerId                            INTEGER,
-                MarkerLabel                         TEXT,
-                MarkerStartTimeTicks                INTEGER,
-                MarkerEndTransitionDurationTicks    INTEGER,
-                PlaylistItemId                      INTEGER NOT NULL,
-                FOREIGN KEY(PlaylistItemId)         REFERENCES PlaylistItem(PlaylistItemId),
-                CHECK(
-                    (MarkerId IS NULL AND MarkerLabel IS NULL AND MarkerStartTimeTicks IS NULL AND MarkerEndTransitionDurationTicks IS NULL) OR
-                    (MarkerId IS NOT NULL AND MarkerLabel IS NOT NULL AND MarkerStartTimeTicks IS NOT NULL)
-                )
-            );
+CREATE TABLE "PlaylistItemAccuracy" (
+	"PlaylistItemAccuracyId"	INTEGER NOT NULL,
+	"Description"	TEXT NOT NULL UNIQUE,
+	PRIMARY KEY("PlaylistItemAccuracyId")
+);
+
+CREATE TABLE "PlaylistItemIndependentMediaMap" (
+	"PlaylistItemId"	INTEGER NOT NULL,
+	"IndependentMediaId"	INTEGER NOT NULL,
+	"DurationTicks"	INTEGER NOT NULL,
+	PRIMARY KEY("PlaylistItemId","IndependentMediaId"),
+	FOREIGN KEY("IndependentMediaId") REFERENCES "IndependentMedia"("IndependentMediaId"),
+	FOREIGN KEY("PlaylistItemId") REFERENCES "PlaylistItem"("PlaylistItemId")
+) WITHOUT ROWID;
+
+CREATE TABLE "PlaylistItemLocationMap" (
+	"PlaylistItemId"	INTEGER NOT NULL,
+	"LocationId"	INTEGER NOT NULL,
+	"MajorMultimediaType"	INTEGER NOT NULL,
+	"BaseDurationTicks"	INTEGER,
+	PRIMARY KEY("PlaylistItemId","LocationId"),
+	FOREIGN KEY("LocationId") REFERENCES "Location"("LocationId"),
+	FOREIGN KEY("PlaylistItemId") REFERENCES "PlaylistItem"("PlaylistItemId")
+) WITHOUT ROWID;
+
+CREATE TABLE "PlaylistItemMarker" (
+	"PlaylistItemMarkerId"	INTEGER NOT NULL,
+	"PlaylistItemId"	INTEGER NOT NULL,
+	"Label"	TEXT NOT NULL,
+	"StartTimeTicks"	INTEGER NOT NULL,
+	"DurationTicks"	INTEGER NOT NULL,
+	"EndTransitionDurationTicks"	INTEGER NOT NULL,
+	UNIQUE("PlaylistItemId","StartTimeTicks"),
+	PRIMARY KEY("PlaylistItemMarkerId"),
+	FOREIGN KEY("PlaylistItemId") REFERENCES "PlaylistItem"("PlaylistItemId")
+);
+
+CREATE TABLE "PlaylistItemMarkerBibleVerseMap" (
+	"PlaylistItemMarkerId"	INTEGER NOT NULL,
+	"VerseId"	INTEGER NOT NULL,
+	PRIMARY KEY("PlaylistItemMarkerId","VerseId"),
+	FOREIGN KEY("PlaylistItemMarkerId") REFERENCES "PlaylistItemMarker"("PlaylistItemMarkerId")
+) WITHOUT ROWID;
+
+CREATE TABLE "PlaylistItemMarkerParagraphMap" (
+	"PlaylistItemMarkerId"	INTEGER NOT NULL,
+	"MepsDocumentId"	INTEGER NOT NULL,
+	"ParagraphIndex"	INTEGER NOT NULL,
+	"MarkerIndexWithinParagraph"	INTEGER NOT NULL,
+	PRIMARY KEY("PlaylistItemMarkerId","MepsDocumentId","ParagraphIndex","MarkerIndexWithinParagraph"),
+	FOREIGN KEY("PlaylistItemMarkerId") REFERENCES "PlaylistItemMarker"("PlaylistItemMarkerId")
+) WITHOUT ROWID;
 
 CREATE TABLE "Tag" (
                 TagId           INTEGER NOT NULL PRIMARY KEY,

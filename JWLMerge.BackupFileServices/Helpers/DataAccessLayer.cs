@@ -12,15 +12,8 @@ namespace JWLMerge.BackupFileServices.Helpers;
 /// Isolates all data access to the SQLite database embedded in
 /// jwlibrary files.
 /// </summary>
-internal sealed class DataAccessLayer
+internal sealed class DataAccessLayer(string databaseFilePath)
 {
-    private readonly string _databaseFilePath;
-
-    public DataAccessLayer(string databaseFilePath)
-    {
-        _databaseFilePath = databaseFilePath;
-    }
-
     /// <summary>
     /// Creates a new empty database using the schema from the current database.
     /// </summary>
@@ -29,7 +22,7 @@ internal sealed class DataAccessLayer
     {
         Log.Logger.Debug($"Creating empty clone: {cloneFilePath}");
 
-        using var source = CreateConnection(_databaseFilePath);
+        using var source = CreateConnection(databaseFilePath);
         using var destination = CreateConnection(cloneFilePath);
 
         source.BackupDatabase(destination, "main", "main");
@@ -91,9 +84,9 @@ internal sealed class DataAccessLayer
         var result = new List<TRowType>();
         var tableName = typeof(TRowType).Name;
 
-        cmd.CommandText = $"select * from {tableName}";
+        cmd.CommandText = $"SELECT * FROM {tableName}";
         Log.Logger.Debug($"SQL: {cmd.CommandText}");
-                
+
         using (var reader = cmd.ExecuteReader())
         {
             while (reader.Read())
@@ -103,7 +96,7 @@ internal sealed class DataAccessLayer
         }
 
         Log.Logger.Debug($"SQL result set count: {result.Count}");
-                
+
         return result;
     }
 
@@ -148,8 +141,9 @@ internal sealed class DataAccessLayer
         ClearTable(connection, "Note");
         ClearTable(connection, "Tag");
         ClearTable(connection, "UserMark");
+        ClearTable(connection, "PlaylistItemLocationMap");
         ClearTable(connection, "Location");
-            
+
         UpdateLastModified(connection);
 
         VacuumDatabase(connection);
@@ -179,10 +173,21 @@ internal sealed class DataAccessLayer
     {
         using var command = connection.CreateCommand();
 
-        command.CommandText = $"delete from {tableName}";
+        command.CommandText = $"DELETE FROM {tableName}";
         Log.Logger.Debug($"SQL: {command.CommandText}");
 
-        command.ExecuteNonQuery();
+        try
+        {
+            command.ExecuteNonQuery();
+        }
+        catch (SqliteException ex)
+        {
+            Log.Logger.Error(ex, "Error clearing table {tableName}", tableName);
+            if (ex.SqliteErrorCode != 1) // Table does not exist. Carry on.
+            {
+                throw;
+            }
+        }
     }
 
     private static void PopulateTable<TRowType>(SqliteConnection connection, List<TRowType> rows)
@@ -203,7 +208,7 @@ internal sealed class DataAccessLayer
             }
 
             using var cmd = connection.CreateCommand();
-            cmd.CommandText = $"insert into {tableName} ({columnNamesCsv}) values ({paramNamesCsv})";
+            cmd.CommandText = $"INSERT INTO {tableName} ({columnNamesCsv}) VALUES ({paramNamesCsv})";
             AddPopulateTableParams(cmd, columnNames, paramNames, row);
 
             cmd.ExecuteNonQuery();
@@ -284,7 +289,7 @@ internal sealed class DataAccessLayer
         return new TagMap
         {
             TagMapId = ReadInt(reader, "TagMapId"),
-                
+
             // added in db v7, April 2020...
             PlaylistItemId = ReadNullableInt(reader, "PlaylistItemId"),
             LocationId = ReadNullableInt(reader, "LocationId"),
@@ -330,7 +335,7 @@ internal sealed class DataAccessLayer
             TimeLastModified = ReadString(reader, "LastModified"),
         };
     }
-        
+
     private UserMark ReadUserMark(SqliteDataReader reader)
     {
         return new UserMark
@@ -356,6 +361,6 @@ internal sealed class DataAccessLayer
 
     private SqliteConnection CreateConnection()
     {
-        return CreateConnection(_databaseFilePath);
+        return CreateConnection(databaseFilePath);
     }
 }

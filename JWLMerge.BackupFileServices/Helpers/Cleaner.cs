@@ -8,15 +8,8 @@ namespace JWLMerge.BackupFileServices.Helpers;
 /// <summary>
 /// Cleans jwlibrary files by removing redundant or anomalous database rows.
 /// </summary>
-internal sealed class Cleaner
+internal sealed class Cleaner(Database database)
 {
-    private readonly Database _database;
-
-    public Cleaner(Database database)
-    {
-        _database = database;
-    }
-
     /// <summary>
     /// Cleans the data, removing unused rows.
     /// </summary>
@@ -24,16 +17,16 @@ internal sealed class Cleaner
     public int Clean()
     {
         // see also DatabaseForeignKeyChecker
-        return CleanBlockRanges() + 
+        return CleanBlockRanges() +
                CleanTagMaps() +
                CleanLocations();
     }
-        
+
     private HashSet<int> GetValidUserMarkIds()
     {
         var result = new HashSet<int>();
-            
-        foreach (var userMark in _database.UserMarks)
+
+        foreach (var userMark in database.UserMarks)
         {
             result.Add(userMark.UserMarkId);
         }
@@ -45,7 +38,7 @@ internal sealed class Cleaner
     {
         var result = new HashSet<int>();
 
-        foreach (var tag in _database.Tags)
+        foreach (var tag in database.Tags)
         {
             result.Add(tag.TagId);
         }
@@ -57,7 +50,7 @@ internal sealed class Cleaner
     {
         var result = new HashSet<int>();
 
-        foreach (var note in _database.Notes)
+        foreach (var note in database.Notes)
         {
             result.Add(note.NoteId);
         }
@@ -69,7 +62,7 @@ internal sealed class Cleaner
     {
         var result = new HashSet<int>();
 
-        foreach (var location in _database.Locations)
+        foreach (var location in database.Locations)
         {
             result.Add(location.LocationId);
         }
@@ -81,13 +74,13 @@ internal sealed class Cleaner
     {
         var result = new HashSet<int>();
 
-        foreach (var bookmark in _database.Bookmarks)
+        foreach (var bookmark in database.Bookmarks)
         {
             result.Add(bookmark.LocationId);
             result.Add(bookmark.PublicationLocationId);
         }
-            
-        foreach (var note in _database.Notes)
+
+        foreach (var note in database.Notes)
         {
             if (note.LocationId != null)
             {
@@ -95,12 +88,12 @@ internal sealed class Cleaner
             }
         }
 
-        foreach (var userMark in _database.UserMarks)
+        foreach (var userMark in database.UserMarks)
         {
             result.Add(userMark.LocationId);
         }
 
-        foreach (var tagMap in _database.TagMaps)
+        foreach (var tagMap in database.TagMaps)
         {
             if (tagMap.LocationId != null)
             {
@@ -108,13 +101,13 @@ internal sealed class Cleaner
             }
         }
 
-        foreach (var inputFld in _database.InputFields)
+        foreach (var inputFld in database.InputFields)
         {
             result.Add(inputFld.LocationId);
         }
 
         Log.Logger.Debug($"Found {result.Count} location Ids in use");
-            
+
         return result;
     }
 
@@ -125,8 +118,8 @@ internal sealed class Cleaner
     private int CleanLocations()
     {
         int removed = 0;
-            
-        var locations = _database.Locations;
+
+        var locations = database.Locations;
         if (locations.Count != 0)
         {
             var locationIds = GetLocationIdsInUse();
@@ -149,7 +142,7 @@ internal sealed class Cleaner
     {
         var removed = 0;
 
-        var tagMaps = _database.TagMaps;
+        var tagMaps = database.TagMaps;
         if (tagMaps.Count != 0)
         {
             var tagIds = GetValidTagIds();
@@ -158,7 +151,7 @@ internal sealed class Cleaner
 
             foreach (var tag in Enumerable.Reverse(tagMaps))
             {
-                if (!tagIds.Contains(tag.TagId) || 
+                if (!tagIds.Contains(tag.TagId) ||
                     (tag.NoteId != null && !noteIds.Contains(tag.NoteId.Value)) ||
                     (tag.LocationId != null && !locationIds.Contains(tag.LocationId.Value)))
                 {
@@ -180,12 +173,12 @@ internal sealed class Cleaner
     {
         int removed = 0;
 
-        var ranges = _database.BlockRanges;
+        var ranges = database.BlockRanges;
         if (ranges.Count != 0)
         {
             var userMarkIdsFound = new HashSet<int>();
             var userMarkIds = GetValidUserMarkIds();
-                
+
             foreach (var range in Enumerable.Reverse(ranges))
             {
                 if (!userMarkIds.Contains(range.UserMarkId))

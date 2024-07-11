@@ -17,8 +17,8 @@ internal static class EventTracker
 
     public static void TrackWrongVer(int verFound, int verExpected)
     {
-        var properties = new Dictionary<string, string> 
-        { 
+        var properties = new Dictionary<string, string>
+        {
             { "found", verFound.ToString(CultureInfo.InvariantCulture) },
             { "expected", verExpected.ToString(CultureInfo.InvariantCulture) },
         };
@@ -38,7 +38,7 @@ internal static class EventTracker
     }
 
     public static void Error(Exception ex, string? context = null)
-    {            
+    {
         if (string.IsNullOrEmpty(context))
         {
             Crashes.TrackError(ex);
@@ -47,7 +47,10 @@ internal static class EventTracker
         {
             var properties = new Dictionary<string, string> { { "context", context } };
             Crashes.TrackError(ex, properties);
-        }            
+        }
+#if DEBUG
+        throw ex;
+#endif
     }
 
     public static void TrackMerge(int numSourceFiles)
