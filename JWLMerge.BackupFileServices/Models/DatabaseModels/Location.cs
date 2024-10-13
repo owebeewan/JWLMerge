@@ -59,8 +59,5 @@ public class Location
     /// </summary>
     public string? Title { get; set; }
 
-    public Location Clone()
-    {
-        return (Location)MemberwiseClone();
-    }
+    public Location Clone() => (Location)MemberwiseClone();
 }

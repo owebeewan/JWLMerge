@@ -100,10 +100,7 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         return result;
     }
 
-    private static string ReadString(SqliteDataReader reader, string columnName)
-    {
-        return reader[columnName].ToString()!;
-    }
+    private static string ReadString(SqliteDataReader reader, string columnName) => reader[columnName].ToString()!;
 
     private static string? ReadNullableString(SqliteDataReader reader, string columnName)
     {
@@ -111,10 +108,7 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         return value == DBNull.Value ? null : value.ToString();
     }
 
-    private static int ReadInt(SqliteDataReader reader, string columnName)
-    {
-        return Convert.ToInt32(reader[columnName], CultureInfo.InvariantCulture);
-    }
+    private static int ReadInt(SqliteDataReader reader, string columnName) => Convert.ToInt32(reader[columnName], CultureInfo.InvariantCulture);
 
     private static int? ReadNullableInt(SqliteDataReader reader, string columnName)
     {
@@ -230,10 +224,7 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         }
     }
 
-    private static List<string> GetParamNames(IReadOnlyCollection<string> columnNames)
-    {
-        return columnNames.Select(columnName => $"@{columnName}").ToList();
-    }
+    private static List<string> GetParamNames(IReadOnlyCollection<string> columnNames) => columnNames.Select(columnName => $"@{columnName}").ToList();
 
     private static List<string> GetColumnNames<TRowType>()
     {
@@ -242,8 +233,7 @@ internal sealed class DataAccessLayer(string databaseFilePath)
     }
 
     private Location ReadLocation(SqliteDataReader reader)
-    {
-        return new Location
+        => new()
         {
             LocationId = ReadInt(reader, "LocationId"),
             BookNumber = ReadNullableInt(reader, "BookNumber"),
@@ -256,11 +246,9 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             Type = ReadInt(reader, "Type"),
             Title = ReadNullableString(reader, "Title"),
         };
-    }
 
     private Note ReadNote(SqliteDataReader reader)
-    {
-        return new Note
+        => new()
         {
             NoteId = ReadInt(reader, "NoteId"),
             Guid = ReadString(reader, "Guid"),
@@ -272,21 +260,17 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             BlockType = ReadInt(reader, "BlockType"),
             BlockIdentifier = ReadNullableInt(reader, "BlockIdentifier"),
         };
-    }
 
     private Tag ReadTag(SqliteDataReader reader)
-    {
-        return new Tag
+        => new()
         {
             TagId = ReadInt(reader, "TagId"),
             Type = ReadInt(reader, "Type"),
             Name = ReadString(reader, "Name"),
         };
-    }
 
     private TagMap ReadTagMap(SqliteDataReader reader)
-    {
-        return new TagMap
+        => new()
         {
             TagMapId = ReadInt(reader, "TagMapId"),
 
@@ -298,11 +282,9 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             TagId = ReadInt(reader, "TagId"),
             Position = ReadInt(reader, "Position"),
         };
-    }
 
     private BlockRange ReadBlockRange(SqliteDataReader reader)
-    {
-        return new BlockRange
+        => new()
         {
             BlockRangeId = ReadInt(reader, "BlockRangeId"),
             BlockType = ReadInt(reader, "BlockType"),
@@ -311,11 +293,9 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             EndToken = ReadNullableInt(reader, "EndToken"),
             UserMarkId = ReadInt(reader, "UserMarkId"),
         };
-    }
 
     private Bookmark ReadBookmark(SqliteDataReader reader)
-    {
-        return new Bookmark
+        => new()
         {
             BookmarkId = ReadInt(reader, "BookmarkId"),
             LocationId = ReadInt(reader, "LocationId"),
@@ -326,19 +306,11 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             BlockType = ReadInt(reader, "BlockType"),
             BlockIdentifier = ReadNullableInt(reader, "BlockIdentifier"),
         };
-    }
 
-    private LastModified ReadLastModified(SqliteDataReader reader)
-    {
-        return new LastModified
-        {
-            TimeLastModified = ReadString(reader, "LastModified"),
-        };
-    }
+    private LastModified ReadLastModified(SqliteDataReader reader) => new() { TimeLastModified = ReadString(reader, "LastModified") };
 
     private UserMark ReadUserMark(SqliteDataReader reader)
-    {
-        return new UserMark
+        => new()
         {
             UserMarkId = ReadInt(reader, "UserMarkId"),
             ColorIndex = ReadInt(reader, "ColorIndex"),
@@ -347,20 +319,14 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             UserMarkGuid = ReadString(reader, "UserMarkGuid"),
             Version = ReadInt(reader, "Version"),
         };
-    }
 
     private InputField ReadInputField(SqliteDataReader reader)
-    {
-        return new InputField
+        => new()
         {
             LocationId = ReadInt(reader, "LocationId"),
             TextTag = ReadString(reader, "TextTag"),
             Value = ReadString(reader, "Value"),
         };
-    }
 
-    private SqliteConnection CreateConnection()
-    {
-        return CreateConnection(databaseFilePath);
-    }
+    private SqliteConnection CreateConnection() => CreateConnection(databaseFilePath);
 }

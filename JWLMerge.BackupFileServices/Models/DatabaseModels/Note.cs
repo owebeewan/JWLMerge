@@ -71,8 +71,5 @@ public class Note
         return DateTime.Parse(LastModified, CultureInfo.InvariantCulture);
     }
 
-    public Note Clone()
-    {
-        return (Note)MemberwiseClone();
-    }
+    public Note Clone() => (Note)MemberwiseClone();
 }

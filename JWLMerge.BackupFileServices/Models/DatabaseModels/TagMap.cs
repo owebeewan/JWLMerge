@@ -14,7 +14,7 @@ public class TagMap
     /// The tag map identifier.
     /// </summary>
     public int TagMapId { get; set; }
-        
+
     /// <summary>
     /// Playlist Item Id.
     /// </summary>
@@ -45,8 +45,5 @@ public class TagMap
     /// </summary>
     public int Position { get; set; }
 
-    public TagMap Clone()
-    {
-        return (TagMap)MemberwiseClone();
-    }
+    public TagMap Clone() => (TagMap)MemberwiseClone();
 }

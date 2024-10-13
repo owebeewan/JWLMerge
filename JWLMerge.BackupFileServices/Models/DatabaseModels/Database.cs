@@ -9,7 +9,7 @@ namespace JWLMerge.BackupFileServices.Models.DatabaseModels;
 public class Database
 {
     private readonly Dictionary<int, int> _bookmarkSlots = [];
-        
+
     private Lazy<Dictionary<Guid, Note>> _notesGuidIndex = null!;
     private Lazy<Dictionary<int, Note>> _notesIdIndex = null!;
     private Lazy<Dictionary<int, List<InputField>>> _inputFieldsIndex = null!;
@@ -34,21 +34,21 @@ public class Database
 
     public LastModified LastModified { get; } = new();
 
-    public List<Location> Locations { get; } = new();
+    public List<Location> Locations { get; } = [];
 
-    public List<Note> Notes { get; } = new();
+    public List<Note> Notes { get; } = [];
 
-    public List<InputField> InputFields { get; } = new();
+    public List<InputField> InputFields { get; } = [];
 
-    public List<Tag> Tags { get; } = new();
+    public List<Tag> Tags { get; } = [];
 
-    public List<TagMap> TagMaps { get; } = new();
+    public List<TagMap> TagMaps { get; } = [];
 
-    public List<BlockRange> BlockRanges { get; } = new();
+    public List<BlockRange> BlockRanges { get; } = [];
 
-    public List<Bookmark> Bookmarks { get; } = new();
+    public List<Bookmark> Bookmarks { get; } = [];
 
-    public List<UserMark> UserMarks { get; } = new();
+    public List<UserMark> UserMarks { get; } = [];
 
     public static string GetDateTimeUtcAsDbString(DateTime dateTime)
     {
@@ -84,7 +84,7 @@ public class Database
         count += FixupNoteValidity();
         count += FixupTagMapValidity();
         count += FixupUserMarkValidity();
-            
+
         if (count > 0)
         {
             ReinitializeIndexes();
@@ -92,7 +92,7 @@ public class Database
     }
 
     public void AddBibleNoteAndUpdateIndex(
-        BibleBookChapterAndVerse verseRef, 
+        BibleBookChapterAndVerse verseRef,
         Note value,
         TagMap? tagMap)
     {
@@ -119,7 +119,7 @@ public class Database
         {
             if (!_notesVerseIndex.Value.TryGetValue(verseRef, out var notes))
             {
-                notes = new List<Note>();
+                notes = [];
                 _notesVerseIndex.Value.Add(verseRef, notes);
             }
 
@@ -137,7 +137,7 @@ public class Database
         {
             if (!_blockRangesUserMarkIdIndex.Value.TryGetValue(value.UserMarkId, out var blockRangeList))
             {
-                blockRangeList = new List<BlockRange>();
+                blockRangeList = [];
                 _blockRangesUserMarkIdIndex.Value.Add(value.UserMarkId, blockRangeList);
             }
 
@@ -165,7 +165,7 @@ public class Database
         {
             if (!_userMarksLocationIdIndex.Value.TryGetValue(value.LocationId, out var marks))
             {
-                marks = new List<UserMark>();
+                marks = [];
                 _userMarksLocationIdIndex.Value.Add(value.LocationId, marks);
             }
 
@@ -190,8 +190,8 @@ public class Database
             _locationsValueIndex.Value.TryAdd(key, value);
         }
 
-        if (_locationsBibleChapterIndex.IsValueCreated && 
-            value.BookNumber != null && 
+        if (_locationsBibleChapterIndex.IsValueCreated &&
+            value.BookNumber != null &&
             value.ChapterNumber != null)
         {
             var key = GetLocationByBibleChapterKey(
@@ -213,15 +213,9 @@ public class Database
         return _notesGuidIndex.Value.TryGetValue(g, out var note) ? note : null;
     }
 
-    public Note? FindNote(int noteId)
-    {
-        return _notesIdIndex.Value.TryGetValue(noteId, out var note) ? note : null;
-    }
+    public Note? FindNote(int noteId) => _notesIdIndex.Value.TryGetValue(noteId, out var note) ? note : null;
 
-    public IEnumerable<Note>? FindNotes(BibleBookChapterAndVerse verseRef)
-    {
-        return _notesVerseIndex.Value.TryGetValue(verseRef, out var notes) ? notes : null;
-    }
+    public IEnumerable<Note>? FindNotes(BibleBookChapterAndVerse verseRef) => _notesVerseIndex.Value.TryGetValue(verseRef, out var notes) ? notes : null;
 
     public UserMark? FindUserMark(string userMarkGuid)
     {
@@ -233,41 +227,19 @@ public class Database
         return _userMarksGuidIndex.Value.TryGetValue(g, out var userMark) ? userMark : null;
     }
 
-    public UserMark? FindUserMark(int userMarkId)
-    {
-        return _userMarksIdIndex.Value.TryGetValue(userMarkId, out var userMark) ? userMark : null;
-    }
+    public UserMark? FindUserMark(int userMarkId) => _userMarksIdIndex.Value.TryGetValue(userMarkId, out var userMark) ? userMark : null;
 
-    public IEnumerable<UserMark>? FindUserMarks(int locationId)
-    {
-        return _userMarksLocationIdIndex.Value.TryGetValue(locationId, out var userMarks) ? userMarks : null;
-    }
+    public IEnumerable<UserMark>? FindUserMarks(int locationId) => _userMarksLocationIdIndex.Value.TryGetValue(locationId, out var userMarks) ? userMarks : null;
 
-    public Tag? FindTag(int tagType, string tagName)
-    {
-        var key = new TagTypeAndName(tagType, tagName);
-        return _tagsNameIndex.Value.TryGetValue(key, out var tag) ? tag : null;
-    }
+    public Tag? FindTag(int tagType, string tagName) => _tagsNameIndex.Value.TryGetValue(new TagTypeAndName(tagType, tagName), out var tag) ? tag : null;
 
-    public Tag? FindTag(int tagId)
-    {
-        return _tagsIdIndex.Value.TryGetValue(tagId, out var tag) ? tag : null;
-    }
+    public Tag? FindTag(int tagId) => _tagsIdIndex.Value.TryGetValue(tagId, out var tag) ? tag : null;
 
-    public TagMap? FindTagMapForNote(int tagId, int noteId)
-    {
-        return _tagMapNoteIndex.Value.TryGetValue(GetTagMapNoteKey(tagId, noteId), out var tag) ? tag : null;
-    }
+    public TagMap? FindTagMapForNote(int tagId, int noteId) => _tagMapNoteIndex.Value.TryGetValue(GetTagMapNoteKey(tagId, noteId), out var tag) ? tag : null;
 
-    public TagMap? FindTagMapForLocation(int tagId, int locationId)
-    {
-        return _tagMapLocationIndex.Value.TryGetValue(GetTagMapLocationKey(tagId, locationId), out var tag) ? tag : null;
-    }
+    public TagMap? FindTagMapForLocation(int tagId, int locationId) => _tagMapLocationIndex.Value.TryGetValue(GetTagMapLocationKey(tagId, locationId), out var tag) ? tag : null;
 
-    public Location? FindLocation(int locationId)
-    {
-        return _locationsIdIndex.Value.TryGetValue(locationId, out var location) ? location : null;
-    }
+    public Location? FindLocation(int locationId) => _locationsIdIndex.Value.TryGetValue(locationId, out var location) ? location : null;
 
     public InputField? FindInputField(int locationId, string textTag)
     {
@@ -311,15 +283,12 @@ public class Database
         {
             ++slot;
         }
-            
+
         _bookmarkSlots[publicationLocationId] = slot;
         return slot;
     }
 
-    private Dictionary<Guid, Note> NoteIndexValueFactory()
-    {
-        return Notes.ToDictionary(note => Guid.Parse(note.Guid));
-    }
+    private Dictionary<Guid, Note> NoteIndexValueFactory() => Notes.ToDictionary(note => Guid.Parse(note.Guid));
 
     private Dictionary<int, List<InputField>> InputFieldsIndexValueFactory()
     {
@@ -329,7 +298,7 @@ public class Database
         {
             if (!result.TryGetValue(fld.LocationId, out var list))
             {
-                list = new List<InputField>();
+                list = [];
                 result.Add(fld.LocationId, list);
             }
 
@@ -339,32 +308,29 @@ public class Database
         return result;
     }
 
-    private Dictionary<int, Note> NoteIdIndexValueFactory()
-    {
-        return Notes.ToDictionary(note => note.NoteId);
-    }
+    private Dictionary<int, Note> NoteIdIndexValueFactory() => Notes.ToDictionary(note => note.NoteId);
 
     private Dictionary<BibleBookChapterAndVerse, List<Note>> NoteVerseIndexValueFactory()
     {
-        Dictionary<BibleBookChapterAndVerse, List<Note>> result = new();
+        Dictionary<BibleBookChapterAndVerse, List<Note>> result = [];
 
         foreach (var note in Notes)
         {
             if (note.BlockType == 2 && // A note on a Bible verse
-                note.LocationId != null && 
-                note.BlockIdentifier != null) 
+                note.LocationId != null &&
+                note.BlockIdentifier != null)
             {
                 var location = FindLocation(note.LocationId.Value);
                 if (location?.BookNumber != null && location.ChapterNumber != null)
                 {
                     var verseRef = new BibleBookChapterAndVerse(
                         location.BookNumber.Value,
-                        location.ChapterNumber.Value, 
+                        location.ChapterNumber.Value,
                         note.BlockIdentifier.Value);
 
                     if (!result.TryGetValue(verseRef, out var notesOnVerse))
                     {
-                        notesOnVerse = new List<Note>();
+                        notesOnVerse = [];
                         result.Add(verseRef, notesOnVerse);
                     }
 
@@ -376,15 +342,9 @@ public class Database
         return result;
     }
 
-    private Dictionary<Guid, UserMark> UserMarkIndexValueFactory()
-    {
-        return UserMarks.ToDictionary(userMark => Guid.Parse(userMark.UserMarkGuid));
-    }
+    private Dictionary<Guid, UserMark> UserMarkIndexValueFactory() => UserMarks.ToDictionary(userMark => Guid.Parse(userMark.UserMarkGuid));
 
-    private Dictionary<int, UserMark> UserMarkIdIndexValueFactory()
-    {
-        return UserMarks.ToDictionary(userMark => userMark.UserMarkId);
-    }
+    private Dictionary<int, UserMark> UserMarkIdIndexValueFactory() => UserMarks.ToDictionary(userMark => userMark.UserMarkId);
 
     private Dictionary<int, List<UserMark>> UserMarksLocationIdIndexValueFactory()
     {
@@ -394,7 +354,7 @@ public class Database
         {
             if (!result.TryGetValue(userMark.LocationId, out var marks))
             {
-                marks = new List<UserMark>();
+                marks = [];
                 result.Add(userMark.LocationId, marks);
             }
 
@@ -431,7 +391,7 @@ public class Database
             if (location.BookNumber != null && location.ChapterNumber != null)
             {
                 var key = GetLocationByBibleChapterKey(
-                    location.BookNumber.Value, 
+                    location.BookNumber.Value,
                     location.ChapterNumber.Value,
                     location.KeySymbol);
 
@@ -441,7 +401,7 @@ public class Database
 
         return result;
     }
-        
+
     private Dictionary<int, List<BlockRange>> BlockRangeIndexValueFactory()
     {
         var result = new Dictionary<int, List<BlockRange>>();
@@ -450,13 +410,13 @@ public class Database
         {
             if (!result.TryGetValue(range.UserMarkId, out var blockRangeList))
             {
-                blockRangeList = new List<BlockRange>();
+                blockRangeList = [];
                 result.Add(range.UserMarkId, blockRangeList);
             }
 
             blockRangeList.Add(range);
         }
-            
+
         return result;
     }
 
@@ -488,25 +448,13 @@ public class Database
         return result;
     }
 
-    private Dictionary<TagTypeAndName, Tag> TagIndexValueFactory()
-    {
-        return Tags.ToDictionary(tag => new TagTypeAndName(tag.Type, tag.Name));
-    }
+    private Dictionary<TagTypeAndName, Tag> TagIndexValueFactory() => Tags.ToDictionary(tag => new TagTypeAndName(tag.Type, tag.Name));
 
-    private Dictionary<int, Tag> TagIdIndexValueFactory()
-    {
-        return Tags.ToDictionary(tag => tag.TagId);
-    }
+    private Dictionary<int, Tag> TagIdIndexValueFactory() => Tags.ToDictionary(tag => tag.TagId);
 
-    private static string GetTagMapNoteKey(int tagId, int noteId)
-    {
-        return $"{tagId}-{noteId}";
-    }
+    private static string GetTagMapNoteKey(int tagId, int noteId) => $"{tagId}-{noteId}";
 
-    private static string GetTagMapLocationKey(int tagId, int locationId)
-    {
-        return $"{tagId}-{locationId}";
-    }
+    private static string GetTagMapLocationKey(int tagId, int locationId) => $"{tagId}-{locationId}";
 
     private Dictionary<string, TagMap> TagMapNoteIndexValueFactory()
     {
@@ -611,7 +559,7 @@ public class Database
                 Log.Logger.Error($"Removed invalid user mark {userMark.UserMarkId}");
             }
         }
-            
+
         return fixupCount;
     }
 
@@ -623,7 +571,7 @@ public class Database
         {
             var tagMap = TagMaps[n];
 
-            if (tagMap.NoteId != null && 
+            if (tagMap.NoteId != null &&
                 (FindTag(tagMap.TagId) == null || FindNote(tagMap.NoteId.Value) == null))
             {
                 ++fixupCount;
@@ -650,7 +598,7 @@ public class Database
         for (var n = Notes.Count - 1; n >= 0; --n)
         {
             var note = Notes[n];
-                
+
             if (note.UserMarkId != null && FindUserMark(note.UserMarkId.Value) == null)
             {
                 ++fixupCount;
@@ -708,7 +656,7 @@ public class Database
                 Log.Logger.Error($"Removed invalid block range {range.BlockRangeId}");
             }
         }
-            
+
         return fixupCount;
     }
 }

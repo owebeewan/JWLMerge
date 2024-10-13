@@ -130,7 +130,7 @@ public sealed class BackupFileService : IBackupFileService
     {
         ArgumentNullException.ThrowIfNull(backup);
 
-        tagIds ??= Array.Empty<int>();
+        tagIds ??= [];
 
         var tagIdsHash = tagIds.ToHashSet();
 
@@ -184,7 +184,7 @@ public sealed class BackupFileService : IBackupFileService
     {
         ArgumentNullException.ThrowIfNull(backup);
 
-        colorIndexes ??= Array.Empty<int>();
+        colorIndexes ??= [];
 
         var userMarkIdsToRemove = new HashSet<int>();
 
@@ -353,7 +353,7 @@ public sealed class BackupFileService : IBackupFileService
         }
 
         // we must retain user marks that are associated with notes...
-        HashSet<int> userMarksToRetain = new();
+        HashSet<int> userMarksToRetain = [];
         foreach (var note in database.Notes)
         {
             if (note.UserMarkId != null)
@@ -465,15 +465,9 @@ public sealed class BackupFileService : IBackupFileService
         database.TagMaps.RemoveAll(x => tagIds.Contains(x.TagMapId));
     }
 
-    private static bool SupportDatabaseVersion(int version)
-    {
-        return version == DatabaseVersionSupported;
-    }
+    private static bool SupportDatabaseVersion(int version) => version == DatabaseVersionSupported;
 
-    private static bool SupportManifestVersion(int version)
-    {
-        return version == ManifestVersionSupported;
-    }
+    private static bool SupportManifestVersion(int version) => version == ManifestVersionSupported;
 
     private static string CreateTemporaryDatabaseFile(
         Database backupDatabase,

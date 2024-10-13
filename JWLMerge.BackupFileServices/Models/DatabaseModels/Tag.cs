@@ -18,8 +18,5 @@ public class Tag
     /// </summary>
     public string Name { get; set; } = null!;
 
-    public Tag Clone()
-    {
-        return (Tag)MemberwiseClone();
-    }
+    public Tag Clone() => (Tag)MemberwiseClone();
 }

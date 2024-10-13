@@ -1,13 +1,8 @@
 ﻿namespace JWLMerge.BackupFileServices.Models;
 
-public class PubNotesFileSection
+public class PubNotesFileSection(PubSymbolAndLanguage symbolAndLanguage)
 {
-    public PubNotesFileSection(PubSymbolAndLanguage symbolAndLanguage)
-    {
-        SymbolAndLanguage = symbolAndLanguage;
-    }
-
-    public PubSymbolAndLanguage SymbolAndLanguage { get; }
+    public PubSymbolAndLanguage SymbolAndLanguage { get; } = symbolAndLanguage;
 
     public int ContentStartLine { get; set; }
 

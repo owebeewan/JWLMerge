@@ -8,8 +8,5 @@ public class InputField
 
     public string Value { get; set; } = null!;
 
-    public InputField Clone()
-    {
-        return (InputField)MemberwiseClone();
-    }
+    public InputField Clone() => (InputField)MemberwiseClone();
 }

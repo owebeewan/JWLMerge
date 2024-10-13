@@ -59,13 +59,13 @@ internal sealed class Merger
         _maxBlockRangeId = 0;
         _maxBookmarkId = 0;
     }
-        
+
     private void Merge(Database source, Database destination)
     {
         ClearTranslators();
 
         source.FixupAnomalies();
-            
+
         MergeUserMarks(source, destination);
         MergeNotes(source, destination);
         MergeInputFields(source, destination);
@@ -134,14 +134,14 @@ internal sealed class Merger
         newBookmark.LocationId = _translatedLocationIds.GetTranslatedId(bookmark.LocationId);
         newBookmark.PublicationLocationId = _translatedLocationIds.GetTranslatedId(bookmark.PublicationLocationId);
         newBookmark.Slot = destination.GetNextBookmarkSlot(newBookmark.PublicationLocationId);
-                
+
         destination.Bookmarks.Add(newBookmark);
     }
 
     private void MergeBlockRanges(Database source, Database destination)
     {
         ProgressMessage(" Block ranges");
-            
+
         foreach (var range in source.BlockRanges)
         {
             var userMarkId = _translatedUserMarkIds.GetTranslatedId(range.UserMarkId);
@@ -160,7 +160,7 @@ internal sealed class Merger
 
     private static bool OverlappingBlockRanges(BlockRange blockRange1, BlockRange blockRange2)
     {
-        if (blockRange1.StartToken == blockRange2.StartToken && 
+        if (blockRange1.StartToken == blockRange2.StartToken &&
             blockRange1.EndToken == blockRange2.EndToken)
         {
             return true;
@@ -174,7 +174,7 @@ internal sealed class Merger
             return false;
         }
 
-        return blockRange2.StartToken < blockRange1.EndToken 
+        return blockRange2.StartToken < blockRange1.EndToken
                && blockRange2.EndToken > blockRange1.StartToken;
     }
 
@@ -193,7 +193,7 @@ internal sealed class Merger
             var tagId = _translatedTagIds.GetTranslatedId(sourceTagMap.TagId);
             var id = 0;
             TagMap? existingTagMap = null;
-                
+
             if (sourceTagMap.LocationId != null)
             {
                 // a tag on a location.
@@ -231,7 +231,7 @@ internal sealed class Merger
     {
         // there is unique constraint on TagId, Position
         var tmpStorage = entries.GroupBy(x => x.TagId).ToDictionary(x => x.Key);
-            
+
         foreach (var item in tmpStorage)
         {
             var pos = 0;
@@ -319,7 +319,7 @@ internal sealed class Merger
         newUserMark.UserMarkId = ++_maxUserMarkId;
         newUserMark.LocationId = _translatedLocationIds.GetTranslatedId(userMark.LocationId);
         destination.UserMarks.Add(newUserMark);
-            
+
         _translatedUserMarkIds.Add(userMark.UserMarkId, newUserMark.UserMarkId);
     }
 
@@ -377,7 +377,7 @@ internal sealed class Merger
         {
             newNote.LocationId = _translatedLocationIds.GetTranslatedId(note.LocationId.Value);
         }
-            
+
         destination.Notes.Add(newNote);
         _translatedNoteIds.Add(note.NoteId, newNote.NoteId);
     }
@@ -401,7 +401,7 @@ internal sealed class Merger
             if (location != null)
             {
                 InsertLocation(location, destination);
-                    
+
                 var locationId = _translatedLocationIds.GetTranslatedId(inputField.LocationId);
                 if (locationId > 0)
                 {
@@ -422,7 +422,7 @@ internal sealed class Merger
     private void MergeNotes(Database source, Database destination)
     {
         ProgressMessage(" Notes");
-            
+
         foreach (var note in source.Notes)
         {
             var existingNote = destination.FindNote(note.Guid);
@@ -449,7 +449,7 @@ internal sealed class Merger
                         InsertLocation(location, destination);
                     }
                 }
-                    
+
                 InsertNote(note, destination);
             }
         }
@@ -466,7 +466,7 @@ internal sealed class Merger
     {
         ProgressEvent?.Invoke(this, new ProgressEventArgs(message));
     }
-        
+
     private void ProgressMessage(string logMessage)
     {
         Log.Logger.Information(logMessage);

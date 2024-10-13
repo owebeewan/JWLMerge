@@ -14,7 +14,7 @@ namespace JWLMerge.BackupFileServices;
 public interface IBackupFileService
 {
     event EventHandler<ProgressEventArgs> ProgressEvent;
-        
+
     /// <summary>
     /// Loads the specified backup file.
     /// </summary>
@@ -119,7 +119,7 @@ public interface IBackupFileService
         BackupFile originalBackupFile,
         IEnumerable<BibleNote> notes,
         string bibleKeySymbol,
-        int? mepsLanguageId, 
+        int? mepsLanguageId,
         ImportBibleNotesParams options);
 
     ExportBibleNotesResult ExportBibleNotes(BackupFile backupFile, string bibleNotesExportFilePath, IExportToFileService exportService);
@@ -142,7 +142,7 @@ public interface IBackupFileService
     /// <param name="newDatabaseFilePath">The new database file path.</param>
     /// <param name="originalJwlibraryFilePathForSchema">The original jwlibrary file path on which to base the new schema.</param>
     void WriteNewDatabase(
-        BackupFile backup, 
+        BackupFile backup,
         string newDatabaseFilePath,
         string originalJwlibraryFilePathForSchema);
 

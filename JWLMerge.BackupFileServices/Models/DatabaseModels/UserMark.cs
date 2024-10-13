@@ -34,8 +34,5 @@ public class UserMark
     /// </summary>
     public int Version { get; set; }
 
-    public UserMark Clone()
-    {
-        return (UserMark)MemberwiseClone();
-    }
+    public UserMark Clone() => (UserMark)MemberwiseClone();
 }
