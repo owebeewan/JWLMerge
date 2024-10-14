@@ -369,7 +369,7 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             EndTrimOffsetTicks = ReadNullableInt(reader, "EndTrimOffsetTicks"),
             Accuracy = ReadInt(reader, "Accuracy"),
             EndAction = ReadInt(reader, "EndAction"),
-            ThumbnailFilePath = ReadString(reader, "ThumbnailFilePath"),
+            ThumbnailFilePath = ReadNullableString(reader, "ThumbnailFilePath"),
         };
 
     private PlaylistItemIndependentMediaMap ReadPlaylistItemIndependentMediaMap(SqliteDataReader reader)
