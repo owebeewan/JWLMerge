@@ -385,6 +385,7 @@ public sealed class BackupFileService : IBackupFileService
         database.PlaylistItemLocationMaps.Clear();
         database.PlaylistItemMarkers.Clear();
         database.PlaylistItems.Clear();
+        database.IndependentMedias.Clear();
         return count;
     }
 

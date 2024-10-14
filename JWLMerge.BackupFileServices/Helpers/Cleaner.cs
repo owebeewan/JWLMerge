@@ -21,6 +21,7 @@ internal sealed class Cleaner(Database database)
         return CleanBlockRanges() +
                CleanTagMaps() +
                CleanLocations() +
+               CleanIndependentMedias() +
                CleanPlaylistItemMarkers() +
                CleanPlaylistItemLocationMaps() +
                CleanPlaylistItemIndependentMediaMaps() +
@@ -197,6 +198,33 @@ internal sealed class Cleaner(Database database)
     }
 
     /// <summary>
+    /// Cleans the independent media list.
+    /// </summary>
+    /// <returns>Number of removed media</returns>
+    private int CleanIndependentMedias()
+    {
+        int removed = 0;
+
+        var medias = database.IndependentMedias;
+        if (medias.Count > 0)
+        {
+            var mediaIds = GetIndependentMediaIdsInUse();
+
+            foreach (var media in Enumerable.Reverse(medias))
+            {
+                if (!mediaIds.Contains(media.IndependentMediaId))
+                {
+                    Log.Logger.Debug($"Removing redundant independent media: {media.IndependentMediaId}");
+                    medias.Remove(media);
+                    ++removed;
+                }
+            }
+        }
+
+        return removed;
+    }
+
+    /// <summary>
     /// Cleans the playlist markers
     /// </summary>
     /// <returns>Number of playlist markers removed</returns>
@@ -205,7 +233,7 @@ internal sealed class Cleaner(Database database)
         int removed = 0;
 
         var markers = database.PlaylistItemMarkers;
-        if (markers.Count != 0)
+        if (markers.Count > 0)
         {
             var playlistItemIds = GetPlaylistItemIdsInUse();
 
@@ -248,6 +276,29 @@ internal sealed class Cleaner(Database database)
         }
 
         return removed;
+    }
+
+    private HashSet<int> GetIndependentMediaIdsInUse()
+    {
+        var result = new HashSet<int>();
+
+        foreach (var map in database.PlaylistItemIndependentMediaMaps)
+        {
+            result.Add(map.IndependentMediaId);
+        }
+
+        foreach (var playListItem in database.PlaylistItems.Where(p => !string.IsNullOrEmpty(p.ThumbnailFilePath)))
+        {
+            var media = database.FindIndependentMedia(playListItem.ThumbnailFilePath!);
+            if (media != null)
+            {
+                result.Add(media.IndependentMediaId);
+            }
+        }
+
+        Log.Logger.Debug($"Found {result.Count} independent media Ids in use");
+
+        return result;
     }
 
     private HashSet<int> GetPlaylistItemIdsInUse()

@@ -16,6 +16,7 @@ internal sealed class Merger
     private readonly IdTranslator _translatedTagIds = new();
     private readonly IdTranslator _translatedUserMarkIds = new();
     private readonly IdTranslator _translatedNoteIds = new();
+    private readonly IdTranslator _translatedIndependentMediaIds = new();
     private readonly IdTranslator _translatedPlaylistItemIds = new();
 
     private int _maxLocationId;
@@ -25,6 +26,7 @@ internal sealed class Merger
     private int _maxTagMapId;
     private int _maxBlockRangeId;
     private int _maxBookmarkId;
+    private int _maxIndependentMediaId;
     private int _maxPlaylistItemId;
     private int _maxPlaylistItemMarkerId;
 
@@ -61,6 +63,7 @@ internal sealed class Merger
         _maxTagMapId = 0;
         _maxBlockRangeId = 0;
         _maxBookmarkId = 0;
+        _maxIndependentMediaId = 0;
         _maxPlaylistItemId = 0;
         _maxPlaylistItemMarkerId = 0;
     }
@@ -74,6 +77,7 @@ internal sealed class Merger
         MergeUserMarks(source, destination);
         MergeNotes(source, destination);
         MergeInputFields(source, destination);
+        MergeIndependentMedias(source, destination);
         MergePlaylistItems(source, destination);
         MergePlaylistItemIndependentMediaMaps(source, destination);
         MergePlaylistItemLocationMap(source, destination);
@@ -93,6 +97,7 @@ internal sealed class Merger
         _translatedTagIds.Clear();
         _translatedUserMarkIds.Clear();
         _translatedNoteIds.Clear();
+        _translatedIndependentMediaIds.Clear();
         _translatedPlaylistItemIds.Clear();
     }
 
@@ -393,6 +398,15 @@ internal sealed class Merger
         destination.BlockRanges.Add(newRange);
     }
 
+    private void InsertIndependentMedia(IndependentMedia independentMedia, Database destination)
+    {
+        var newIndependentMedia = independentMedia.Clone();
+        newIndependentMedia.IndependentMediaId = ++_maxIndependentMediaId;
+
+        destination.IndependentMedias.Add(newIndependentMedia);
+        _translatedIndependentMediaIds.Add(independentMedia.IndependentMediaId, newIndependentMedia.IndependentMediaId);
+    }
+
     private void InsertPlaylistItem(PlaylistItem playlistItem, Database destination)
     {
         var newPlaylistItem = playlistItem.Clone();
@@ -405,12 +419,14 @@ internal sealed class Merger
     private void InsertPlaylistItemIndependentMediaMap(PlaylistItemIndependentMediaMap mediaMap, Database destination)
     {
         var playlistItemId = _translatedPlaylistItemIds.GetTranslatedId(mediaMap.PlaylistItemId);
+        var independentMediaId = _translatedIndependentMediaIds.GetTranslatedId(mediaMap.IndependentMediaId);
 
-        if (playlistItemId > 0)
+        if (playlistItemId > 0 && independentMediaId > 0)
         {
             var newMediaMap = mediaMap.Clone();
 
             newMediaMap.PlaylistItemId = playlistItemId;
+            newMediaMap.IndependentMediaId = independentMediaId;
             destination.PlaylistItemIndependentMediaMaps.Add(newMediaMap);
         }
     }
@@ -502,6 +518,20 @@ internal sealed class Merger
                 }
 
                 InsertNote(note, destination);
+            }
+        }
+    }
+
+    private void MergeIndependentMedias(Database source, Database destination)
+    {
+        ProgressMessage(" Independent Media");
+
+        foreach (var independentMedia in source.IndependentMedias)
+        {
+            var existingIndependentMedia = destination.FindIndependentMedia(independentMedia.FilePath.Trim());
+            if (existingIndependentMedia == null)
+            {
+                InsertIndependentMedia(independentMedia, destination);
             }
         }
     }

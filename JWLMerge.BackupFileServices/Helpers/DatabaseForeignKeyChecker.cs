@@ -13,6 +13,7 @@ internal static class DatabaseForeignKeyChecker
         CheckNoteValidity(database);
         CheckTagMapValidity(database);
         CheckUserMarkValidity(database);
+        CheckIndependentMediaValidity(database);
         CheckPlaylistItemValidity(database);
         CheckPlaylistItemIndependentMediaMapValidity(database);
         CheckPlaylistItemLocationMapValidity(database);
@@ -106,6 +107,17 @@ internal static class DatabaseForeignKeyChecker
         }
     }
 
+    private static void CheckIndependentMediaValidity(Database database)
+    {
+        foreach (var independentMedia in database.IndependentMedias)
+        {
+            if (database.FindIndependentMedia(independentMedia.IndependentMediaId) == null)
+            {
+                throw new BackupFileServicesException($"Could not find independent media {independentMedia.IndependentMediaId}");
+            }
+        }
+    }
+
     private static void CheckPlaylistItemValidity(Database database)
     {
         foreach (var playlistItem in database.PlaylistItems)
@@ -113,6 +125,11 @@ internal static class DatabaseForeignKeyChecker
             if (database.FindPlaylistItem(playlistItem.PlaylistItemId) == null)
             {
                 throw new BackupFileServicesException($"Could not find playlist item {playlistItem.PlaylistItemId}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(playlistItem.ThumbnailFilePath) && database.FindIndependentMedia(playlistItem.ThumbnailFilePath) == null)
+            {
+                throw new BackupFileServicesException($"Could not find independent media for playlist item {playlistItem.PlaylistItemId}");
             }
         }
     }
@@ -124,6 +141,11 @@ internal static class DatabaseForeignKeyChecker
             if (database.FindPlaylistItem(playlistItemIndependentMediaMap.PlaylistItemId) == null)
             {
                 throw new BackupFileServicesException($"Could not find playlist item for independent media {playlistItemIndependentMediaMap.IndependentMediaId}");
+            }
+
+            if (database.FindIndependentMedia(playlistItemIndependentMediaMap.IndependentMediaId) == null)
+            {
+                throw new BackupFileServicesException($"Could not find independent media for playlist item {playlistItemIndependentMediaMap.PlaylistItemId}");
             }
         }
     }

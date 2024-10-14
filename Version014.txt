@@ -92,6 +92,17 @@ CREATE TABLE "Note" (
                 FOREIGN KEY(LocationId) REFERENCES Location(LocationId)
             );
 
+CREATE TABLE IndependentMedia(
+	            IndependentMediaId  INTEGER NOT NULL PRIMARY KEY,
+	            OriginalFilename    TEXT NOT NULL,
+	            FilePath            TEXT NOT NULL UNIQUE,
+	            MimeType            TEXT NOT NULL,  
+	            Hash                TEXT NOT NULL,
+	            CHECK(length(OriginalFilename) > 0),
+	            CHECK(length(FilePath) > 0),
+	            CHECK(length(MimeType) > 0),
+	            CHECK(length(Hash) > 0))
+
 CREATE TABLE PlaylistItem(
                 PlaylistItemId               INTEGER NOT NULL PRIMARY KEY,
                 Label                        TEXT NOT NULL,

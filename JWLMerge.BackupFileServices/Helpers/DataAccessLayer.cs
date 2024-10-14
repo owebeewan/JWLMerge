@@ -41,6 +41,7 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         PopulateTable(connection, dataToUse.UserMarks);
         PopulateTable(connection, dataToUse.Tags);
         PopulateTable(connection, dataToUse.Notes);
+        PopulateTable(connection, dataToUse.IndependentMedias);
         PopulateTable(connection, dataToUse.PlaylistItems);
         PopulateTable(connection, dataToUse.PlaylistItemIndependentMediaMaps);
         PopulateTable(connection, dataToUse.PlaylistItemLocationMaps);
@@ -72,6 +73,7 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         result.Bookmarks.AddRange(ReadAllRows(connection, ReadBookmark));
         result.UserMarks.AddRange(ReadAllRows(connection, ReadUserMark));
         result.InputFields.AddRange(ReadAllRows(connection, ReadInputField));
+        result.IndependentMedias.AddRange(ReadAllRows(connection, ReadIndependentMedia));
         result.PlaylistItems.AddRange(ReadAllRows(connection, ReadPlaylistItem));
         result.PlaylistItemIndependentMediaMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemIndependentMediaMap));
         result.PlaylistItemLocationMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemLocationMap));
@@ -156,6 +158,7 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         ClearTable(connection, "PlaylistItemMarker");
         ClearTable(connection, "PlaylistItemIndependentMediaMap");
         ClearTable(connection, "PlaylistItem");
+        ClearTable(connection, "IndependentMedia");
 
         UpdateLastModified(connection);
 
@@ -345,6 +348,16 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             LocationId = ReadInt(reader, "LocationId"),
             TextTag = ReadString(reader, "TextTag"),
             Value = ReadString(reader, "Value"),
+        };
+
+    private IndependentMedia ReadIndependentMedia(SqliteDataReader reader)
+        => new()
+        {
+            IndependentMediaId = ReadInt(reader, "IndependentMediaId"),
+            OriginalFileName = ReadString(reader, "OriginalFileName"),
+            FilePath = ReadString(reader, "FilePath"),
+            MimeType = ReadString(reader, "MimeType"),
+            Hash = ReadString(reader, "Hash"),
         };
 
     private PlaylistItem ReadPlaylistItem(SqliteDataReader reader)
