@@ -118,6 +118,9 @@ internal sealed class DetailViewModel : ObservableObject
 
                     case JwLibraryFileDataTypes.Manifest:
                         return ManifestAsItemsSource(BackupFile?.Manifest);
+
+                    case JwLibraryFileDataTypes.Playlist:
+                        return BackupFile?.Database.PlaylistItems;
                 }
             }
 
@@ -149,10 +152,8 @@ internal sealed class DetailViewModel : ObservableObject
         return result;
     }
 
-    private static List<DataTypeListItem> CreateListItems()
-    {
-        return new()
-        {
+    private static List<DataTypeListItem> CreateListItems() =>
+        [
             new("Manifest", JwLibraryFileDataTypes.Manifest),
             new("Block Range", JwLibraryFileDataTypes.BlockRange),
             new("Bookmark", JwLibraryFileDataTypes.Bookmark),
@@ -163,6 +164,6 @@ internal sealed class DetailViewModel : ObservableObject
             new("Tag", JwLibraryFileDataTypes.Tag),
             new("Tag Map", JwLibraryFileDataTypes.TagMap),
             new("User Mark", JwLibraryFileDataTypes.UserMark),
-        };
-    }
+            new("Playlist", JwLibraryFileDataTypes.Playlist),
+        ];
 }

@@ -180,4 +180,11 @@ public interface IBackupFileService
     /// <param name="database">The database.</param>
     /// <returns>Number of items removed</returns>
     int RemoveUnderlining(Database database);
+
+    /// <summary>
+    /// Removes playlists from the specified database
+    /// </summary>
+    /// <param name="database">The database.</param>
+    /// <returns>Number of items removed</returns>
+    int RemovePlaylists(Database database);
 }

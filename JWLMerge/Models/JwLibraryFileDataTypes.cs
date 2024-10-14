@@ -12,4 +12,5 @@ internal enum JwLibraryFileDataTypes
     Tag,
     TagMap,
     UserMark,
+    Playlist,
 }

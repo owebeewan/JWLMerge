@@ -13,6 +13,10 @@ internal static class DatabaseForeignKeyChecker
         CheckNoteValidity(database);
         CheckTagMapValidity(database);
         CheckUserMarkValidity(database);
+        CheckPlaylistItemValidity(database);
+        CheckPlaylistItemIndependentMediaMapValidity(database);
+        CheckPlaylistItemLocationMapValidity(database);
+        CheckPlaylistItemMarkerValidity(database);
     }
 
     private static void CheckBlockRangeValidity(Database database)
@@ -83,6 +87,11 @@ internal static class DatabaseForeignKeyChecker
             {
                 throw new BackupFileServicesException($"Could not find location for tag map {tagMap.TagMapId}");
             }
+
+            if (tagMap.PlaylistItemId != null && database.FindPlaylistItem(tagMap.PlaylistItemId.Value) == null)
+            {
+                throw new BackupFileServicesException($"Could not find playlist item for tag map {tagMap.TagMapId}");
+            }
         }
     }
 
@@ -93,6 +102,55 @@ internal static class DatabaseForeignKeyChecker
             if (database.FindLocation(userMark.LocationId) == null)
             {
                 throw new BackupFileServicesException($"Could not find location for user mark {userMark.UserMarkId}");
+            }
+        }
+    }
+
+    private static void CheckPlaylistItemValidity(Database database)
+    {
+        foreach (var playlistItem in database.PlaylistItems)
+        {
+            if (database.FindPlaylistItem(playlistItem.PlaylistItemId) == null)
+            {
+                throw new BackupFileServicesException($"Could not find playlist item {playlistItem.PlaylistItemId}");
+            }
+        }
+    }
+
+    private static void CheckPlaylistItemIndependentMediaMapValidity(Database database)
+    {
+        foreach (var playlistItemIndependentMediaMap in database.PlaylistItemIndependentMediaMaps)
+        {
+            if (database.FindPlaylistItem(playlistItemIndependentMediaMap.PlaylistItemId) == null)
+            {
+                throw new BackupFileServicesException($"Could not find playlist item for independent media {playlistItemIndependentMediaMap.IndependentMediaId}");
+            }
+        }
+    }
+
+    private static void CheckPlaylistItemLocationMapValidity(Database database)
+    {
+        foreach (var playlistItemLocationMap in database.PlaylistItemLocationMaps)
+        {
+            if (database.FindPlaylistItem(playlistItemLocationMap.PlaylistItemId) == null)
+            {
+                throw new BackupFileServicesException($"Could not find playlist item for location {playlistItemLocationMap.LocationId}");
+            }
+
+            if (database.FindLocation(playlistItemLocationMap.LocationId) == null)
+            {
+                throw new BackupFileServicesException($"Could not find location for playlist item {playlistItemLocationMap.PlaylistItemId}");
+            }
+        }
+    }
+
+    private static void CheckPlaylistItemMarkerValidity(Database database)
+    {
+        foreach (var playlistItemMarker in database.PlaylistItemMarkers)
+        {
+            if (database.FindPlaylistItem(playlistItemMarker.PlaylistItemId) == null)
+            {
+                throw new BackupFileServicesException($"Could not find playlist item for marker {playlistItemMarker.PlaylistItemMarkerId}");
             }
         }
     }

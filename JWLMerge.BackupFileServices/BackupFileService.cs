@@ -376,6 +376,19 @@ public sealed class BackupFileService : IBackupFileService
     }
 
     /// <inheritdoc />
+    public int RemovePlaylists(Database database)
+    {
+        ArgumentNullException.ThrowIfNull(database);
+
+        var count = database.PlaylistItems.Count;
+        database.PlaylistItemIndependentMediaMaps.Clear();
+        database.PlaylistItemLocationMaps.Clear();
+        database.PlaylistItemMarkers.Clear();
+        database.PlaylistItems.Clear();
+        return count;
+    }
+
+    /// <inheritdoc />
     public BackupFile Merge(IReadOnlyCollection<BackupFile> files)
     {
         ArgumentNullException.ThrowIfNull(files);

@@ -41,6 +41,10 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         PopulateTable(connection, dataToUse.UserMarks);
         PopulateTable(connection, dataToUse.Tags);
         PopulateTable(connection, dataToUse.Notes);
+        PopulateTable(connection, dataToUse.PlaylistItems);
+        PopulateTable(connection, dataToUse.PlaylistItemIndependentMediaMaps);
+        PopulateTable(connection, dataToUse.PlaylistItemLocationMaps);
+        PopulateTable(connection, dataToUse.PlaylistItemMarkers);
         PopulateTable(connection, dataToUse.TagMaps);
         PopulateTable(connection, dataToUse.InputFields);
         PopulateTable(connection, dataToUse.Bookmarks);
@@ -68,6 +72,10 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         result.Bookmarks.AddRange(ReadAllRows(connection, ReadBookmark));
         result.UserMarks.AddRange(ReadAllRows(connection, ReadUserMark));
         result.InputFields.AddRange(ReadAllRows(connection, ReadInputField));
+        result.PlaylistItems.AddRange(ReadAllRows(connection, ReadPlaylistItem));
+        result.PlaylistItemIndependentMediaMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemIndependentMediaMap));
+        result.PlaylistItemLocationMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemLocationMap));
+        result.PlaylistItemMarkers.AddRange(ReadAllRows(connection, ReadPlaylistItemMarker));
 
         // ensure bookmarks appear in similar order to original.
         result.Bookmarks.Sort((bookmark1, bookmark2) => bookmark1.Slot.CompareTo(bookmark2.Slot));
@@ -116,6 +124,14 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         return value == DBNull.Value ? null : Convert.ToInt32(value, CultureInfo.InvariantCulture);
     }
 
+    private static double ReadLong(SqliteDataReader reader, string columnName) => Convert.ToDouble(reader[columnName], CultureInfo.InvariantCulture);
+
+    private static double? ReadNullableLong(SqliteDataReader reader, string columnName)
+    {
+        var value = reader[columnName];
+        return value == DBNull.Value ? null : Convert.ToDouble(reader[columnName], CultureInfo.InvariantCulture);
+    }
+
     private static SqliteConnection CreateConnection(string filePath)
     {
         var connectionString = $"Data Source={filePath};Pooling=false";
@@ -137,6 +153,9 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         ClearTable(connection, "UserMark");
         ClearTable(connection, "PlaylistItemLocationMap");
         ClearTable(connection, "Location");
+        ClearTable(connection, "PlaylistItemMarker");
+        ClearTable(connection, "PlaylistItemIndependentMediaMap");
+        ClearTable(connection, "PlaylistItem");
 
         UpdateLastModified(connection);
 
@@ -326,6 +345,46 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             LocationId = ReadInt(reader, "LocationId"),
             TextTag = ReadString(reader, "TextTag"),
             Value = ReadString(reader, "Value"),
+        };
+
+    private PlaylistItem ReadPlaylistItem(SqliteDataReader reader)
+        => new()
+        {
+            PlaylistItemId = ReadInt(reader, "PlaylistItemId"),
+            Label = ReadString(reader, "Label"),
+            StartTrimOffsetTicks = ReadNullableInt(reader, "StartTrimOffsetTicks"),
+            EndTrimOffsetTicks = ReadNullableInt(reader, "EndTrimOffsetTicks"),
+            Accuracy = ReadInt(reader, "Accuracy"),
+            EndAction = ReadInt(reader, "EndAction"),
+            ThumbnailFilePath = ReadString(reader, "ThumbnailFilePath"),
+        };
+
+    private PlaylistItemIndependentMediaMap ReadPlaylistItemIndependentMediaMap(SqliteDataReader reader)
+        => new()
+        {
+            PlaylistItemId = ReadInt(reader, "PlaylistItemId"),
+            IndependentMediaId = ReadInt(reader, "IndependentMediaId"),
+            DurationTicks = ReadLong(reader, "DurationTicks"),
+        };
+
+    private PlaylistItemLocationMap ReadPlaylistItemLocationMap(SqliteDataReader reader)
+        => new()
+        {
+            PlaylistItemId = ReadInt(reader, "PlaylistItemId"),
+            LocationId = ReadInt(reader, "LocationId"),
+            MajorMultimediaType = ReadInt(reader, "MajorMultimediaType"),
+            BaseDurationTicks = ReadNullableLong(reader, "BaseDurationTicks"),
+        };
+
+    private PlaylistItemMarker ReadPlaylistItemMarker(SqliteDataReader reader)
+        => new()
+        {
+            PlaylistItemMarkerId = ReadInt(reader, "PlaylistItemMarkerId"),
+            PlaylistItemId = ReadInt(reader, "PlaylistItemId"),
+            Label = ReadString(reader, "Label"),
+            StartTimeTicks = ReadInt(reader, "StartTimeTicks"),
+            DurationTicks = ReadInt(reader, "DurationTicks"),
+            EndTransitionDurationTicks = ReadInt(reader, "EndTransitionDurationTicks"),
         };
 
     private SqliteConnection CreateConnection() => CreateConnection(databaseFilePath);

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DocumentFormat.OpenXml.Spreadsheet;
 using JWLMerge.BackupFileServices.Models.DatabaseModels;
 using Serilog;
 
@@ -19,7 +20,11 @@ internal sealed class Cleaner(Database database)
         // see also DatabaseForeignKeyChecker
         return CleanBlockRanges() +
                CleanTagMaps() +
-               CleanLocations();
+               CleanLocations() +
+               CleanPlaylistItemMarkers() +
+               CleanPlaylistItemLocationMaps() +
+               CleanPlaylistItemIndependentMediaMaps() +
+               CleanPlaylistItems();
     }
 
     private HashSet<int> GetValidUserMarkIds()
@@ -136,6 +141,145 @@ internal sealed class Cleaner(Database database)
         }
 
         return removed;
+    }
+
+    /// <summary>
+    /// Cleans the playlists
+    /// </summary>
+    /// <returns>Number of playlist item rows removed.</returns>
+    private int CleanPlaylistItems()
+    {
+        var removed = 0;
+        var playlistItems = database.PlaylistItems;
+        if (playlistItems.Count != 0)
+        {
+            var playlistItemIds = GetPlaylistItemIdsInUse();
+
+            foreach (var playlistItem in Enumerable.Reverse(playlistItems))
+            {
+                if (!playlistItemIds.Contains(playlistItem.PlaylistItemId))
+                {
+                    Log.Logger.Debug($"Removing redundant playlist item id: {playlistItem.PlaylistItemId}");
+                    playlistItems.Remove(playlistItem);
+                    ++removed;
+                }
+            }
+        }
+
+        return removed;
+    }
+
+    /// <summary>
+    /// Cleans the playlist independent media maps
+    /// </summary>
+    /// <returns>Number of independent media maps removed</returns>
+    private int CleanPlaylistItemIndependentMediaMaps()
+    {
+        int removed = 0;
+
+        var maps = database.PlaylistItemIndependentMediaMaps;
+        if (maps.Count != 0)
+        {
+            var playlistItemIds = GetPlaylistItemIdsInUse();
+
+            foreach (var map in Enumerable.Reverse(maps))
+            {
+                if (!playlistItemIds.Contains(map.PlaylistItemId))
+                {
+                    Log.Logger.Debug($"Removing redundant independent media map: {map.IndependentMediaId}");
+                    maps.Remove(map);
+                    ++removed;
+                }
+            }
+        }
+
+        return removed;
+    }
+
+    /// <summary>
+    /// Cleans the playlist markers
+    /// </summary>
+    /// <returns>Number of playlist markers removed</returns>
+    private int CleanPlaylistItemMarkers()
+    {
+        int removed = 0;
+
+        var markers = database.PlaylistItemMarkers;
+        if (markers.Count != 0)
+        {
+            var playlistItemIds = GetPlaylistItemIdsInUse();
+
+            foreach (var marker in Enumerable.Reverse(markers))
+            {
+                if (!playlistItemIds.Contains(marker.PlaylistItemId))
+                {
+                    Log.Logger.Debug($"Removing redundant playlist item marker: {marker.PlaylistItemMarkerId}");
+                    markers.Remove(marker);
+                    ++removed;
+                }
+            }
+        }
+
+        return removed;
+    }
+
+    /// <summary>
+    /// Clean playlist item location maps
+    /// </summary>
+    /// <returns>Number of removed item location maps</returns>
+    private int CleanPlaylistItemLocationMaps()
+    {
+        int removed = 0;
+
+        var maps = database.PlaylistItemLocationMaps;
+        if (maps.Count != 0)
+        {
+            var playlistItemIds = GetPlaylistItemIdsInUse();
+
+            foreach (var map in Enumerable.Reverse(maps))
+            {
+                if (!playlistItemIds.Contains(map.PlaylistItemId))
+                {
+                    Log.Logger.Debug($"Removing redundant playlist item location map: {map.LocationId}");
+                    maps.Remove(map);
+                    ++removed;
+                }
+            }
+        }
+
+        return removed;
+    }
+
+    private HashSet<int> GetPlaylistItemIdsInUse()
+    {
+        var result = new HashSet<int>();
+
+        foreach (var bookmark in database.PlaylistItemIndependentMediaMaps)
+        {
+            result.Add(bookmark.PlaylistItemId);
+        }
+
+        foreach (var note in database.PlaylistItemLocationMaps)
+        {
+            result.Add(note.PlaylistItemId);
+        }
+
+        foreach (var userMark in database.PlaylistItemMarkers)
+        {
+            result.Add(userMark.PlaylistItemId);
+        }
+
+        foreach (var tagMap in database.TagMaps)
+        {
+            if (tagMap.PlaylistItemId != null)
+            {
+                result.Add(tagMap.PlaylistItemId.Value);
+            }
+        }
+
+        Log.Logger.Debug($"Found {result.Count} playlist item Ids in use");
+
+        return result;
     }
 
     private int CleanTagMaps()
