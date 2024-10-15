@@ -187,4 +187,12 @@ public interface IBackupFileService
     /// <param name="database">The database.</param>
     /// <returns>Number of items removed</returns>
     int RemovePlaylists(Database database);
+
+    /// <summary>
+    /// Writes any independent media present in the backups
+    /// </summary>
+    /// <param name="backup">The overall backup file</param>
+    /// <param name="sourceFiles">The source files to retrieve files from</param>
+    /// <param name="outputFileName">The target file name to write the files to</param>
+    void WriteIndependentMedia(BackupFile backup, IEnumerable<string> sourceFiles, string outputFileName);
 }

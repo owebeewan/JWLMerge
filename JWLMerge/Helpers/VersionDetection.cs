@@ -43,8 +43,8 @@ internal static class VersionDetection
     public static Version GetCurrentVersion()
     {
         var ver = Assembly.GetExecutingAssembly().GetName().Version;
-        return ver != null 
-            ? new Version($"{ver.Major}.{ver.Minor}.{ver.Build}.{ver.Revision}") 
+        return ver != null
+            ? new Version($"{ver.Major}.{ver.Minor}.{ver.Build}.{ver.Revision}")
             : new Version();
     }
 }

@@ -466,11 +466,46 @@ public sealed class BackupFileService : IBackupFileService
         return new BackupFile(newManifest, originalBackupFile.Database, originalBackupFile.FilePath);
     }
 
+    /// <inheritdoc />
     public ExportBibleNotesResult ExportBibleNotes(
         BackupFile backupFile, string bibleNotesExportFilePath, IExportToFileService exportService)
     {
         var service = new NotesExporter();
         return service.ExportBibleNotes(backupFile, bibleNotesExportFilePath, exportService);
+    }
+
+    /// <inheritdoc />
+    public void WriteIndependentMedia(BackupFile backup, IEnumerable<string> sourceFiles, string outputFileName)
+    {
+        if (backup.Database.IndependentMedias.Count == 0)
+        {
+            return;
+        }
+
+        var fileTracker = new List<string>();
+        using var targetFileStream = new FileStream(outputFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+        using var targetArchive = new ZipArchive(targetFileStream, ZipArchiveMode.Update);
+        foreach (var file in sourceFiles)
+        {
+            using var sourceFileStream = File.OpenRead(file);
+            using var sourceArchive = new ZipArchive(sourceFileStream, ZipArchiveMode.Read);
+            foreach (var media in backup.Database.IndependentMedias)
+            {
+                if (fileTracker.Contains(media.FilePath))
+                {
+                    continue;
+                }
+                
+                if (sourceArchive.GetEntry(media.FilePath) is { } entry)
+                {
+                    var targetEntry = targetArchive.CreateEntry(media.FilePath);
+                    using var targetStream = targetEntry.Open();
+                    using var sourceStream = entry.Open();
+                    sourceStream.CopyTo(targetStream);
+                    fileTracker.Add(media.FilePath);
+                }
+            }
+        }
     }
 
     private static void RemoveSelectedTags(Database database, HashSet<int> tagIds)

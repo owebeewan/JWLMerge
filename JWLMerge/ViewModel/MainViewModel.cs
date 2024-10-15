@@ -689,6 +689,7 @@ internal sealed class MainViewModel : ObservableObject
                 {
                     var mergedFile = _backupFileService.Merge(Files.Select(x => x.BackupFile).ToArray());
                     _backupFileService.WriteNewDatabase(mergedFile, destPath, schemaFilePath);
+                    _backupFileService.WriteIndependentMedia(mergedFile, Files.Select(x => x.FilePath), destPath);
                     _snackbarService.Enqueue("Merged successfully");
                 }
             }

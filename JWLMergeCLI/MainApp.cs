@@ -12,7 +12,7 @@ namespace JWLMergeCLI;
 internal sealed class MainApp
 {
     public event EventHandler<ProgressEventArgs>? ProgressEvent;
-        
+
     /// <summary>
     /// Runs the app.
     /// </summary>
@@ -21,10 +21,11 @@ internal sealed class MainApp
     {
         var backupFileService = new BackupFileService();
         backupFileService.ProgressEvent += BackupFileServiceProgress;
-            
+
         var backup = backupFileService.Merge(args.BackupFiles);
         string outputFileName = args.OutputFilePath ?? $"{backup.Manifest.Name}.jwlibrary";
         backupFileService.WriteNewDatabase(backup, outputFileName, args.BackupFiles[0]);
+        backupFileService.WriteIndependentMedia(backup, args.BackupFiles, outputFileName);
 
         var logMessage = $"{args.BackupFiles.Length} backup files merged to {outputFileName}";
         Log.Logger.Information(logMessage);
