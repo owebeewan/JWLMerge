@@ -24,6 +24,7 @@ public class Database
     private Lazy<Dictionary<int, Tag>> _tagsIdIndex = null!;
     private Lazy<Dictionary<string, TagMap>> _tagMapNoteIndex = null!;
     private Lazy<Dictionary<string, TagMap>> _tagMapLocationIndex = null!;
+    private Lazy<Dictionary<string, TagMap>> _tagMapPlaylistItemIndex = null!;
     private Lazy<Dictionary<int, List<BlockRange>>> _blockRangesUserMarkIdIndex = null!;
     private Lazy<Dictionary<string, Bookmark>> _bookmarksIndex = null!;
     private Lazy<Dictionary<string, IndependentMedia>> _independentMediasFilePathIndex = null!;
@@ -255,6 +256,8 @@ public class Database
     public TagMap? FindTagMapForNote(int tagId, int noteId) => _tagMapNoteIndex.Value.TryGetValue(GetTagMapNoteKey(tagId, noteId), out var tag) ? tag : null;
 
     public TagMap? FindTagMapForLocation(int tagId, int locationId) => _tagMapLocationIndex.Value.TryGetValue(GetTagMapLocationKey(tagId, locationId), out var tag) ? tag : null;
+
+    public TagMap? FindTagMapForPlaylistItem(int tagId, int playlistItemId) => _tagMapPlaylistItemIndex.Value.TryGetValue(GetTagMapPlaylistItemKey(tagId, playlistItemId), out var tag) ? tag : null;
 
     public Location? FindLocation(int locationId) => _locationsIdIndex.Value.TryGetValue(locationId, out var location) ? location : null;
 
@@ -530,6 +533,8 @@ public class Database
 
     private static string GetTagMapLocationKey(int tagId, int locationId) => $"{tagId}-{locationId}";
 
+    private static string GetTagMapPlaylistItemKey(int tagId, int playlistItemId) => $"{tagId}-{playlistItemId}";
+
     private Dictionary<string, TagMap> TagMapNoteIndexValueFactory()
     {
         var result = new Dictionary<string, TagMap>();
@@ -538,7 +543,7 @@ public class Database
         {
             if (tagMap.NoteId != null)
             {
-                string key = GetTagMapNoteKey(tagMap.TagId, tagMap.NoteId.Value);
+                var key = GetTagMapNoteKey(tagMap.TagId, tagMap.NoteId.Value);
                 result.Add(key, tagMap);
             }
         }
@@ -554,7 +559,23 @@ public class Database
         {
             if (tagMap.LocationId != null)
             {
-                string key = GetTagMapLocationKey(tagMap.TagId, tagMap.LocationId.Value);
+                var key = GetTagMapLocationKey(tagMap.TagId, tagMap.LocationId.Value);
+                result.Add(key, tagMap);
+            }
+        }
+
+        return result;
+    }
+
+    private Dictionary<string, TagMap> TagMapPlaylistItemIndexValueFactory()
+    {
+        var result = new Dictionary<string, TagMap>();
+
+        foreach (var tagMap in TagMaps)
+        {
+            if (tagMap.PlaylistItemId != null)
+            {
+                var key = GetTagMapPlaylistItemKey(tagMap.TagId, tagMap.PlaylistItemId.Value);
                 result.Add(key, tagMap);
             }
         }
@@ -578,6 +599,7 @@ public class Database
         _tagsIdIndex = new Lazy<Dictionary<int, Tag>>(() => Tags.ToDictionary(tag => tag.TagId));
         _tagMapNoteIndex = new Lazy<Dictionary<string, TagMap>>(TagMapNoteIndexValueFactory);
         _tagMapLocationIndex = new Lazy<Dictionary<string, TagMap>>(TagMapLocationIndexValueFactory);
+        _tagMapPlaylistItemIndex = new Lazy<Dictionary<string, TagMap>>(TagMapPlaylistItemIndexValueFactory);
         _blockRangesUserMarkIdIndex = new Lazy<Dictionary<int, List<BlockRange>>>(BlockRangeIndexValueFactory);
         _bookmarksIndex = new Lazy<Dictionary<string, Bookmark>>(BookmarkIndexValueFactory);
         _independentMediasFilePathIndex = new Lazy<Dictionary<string, IndependentMedia>>(() => IndependentMedias.ToDictionary(media => media.FilePath.Trim()));

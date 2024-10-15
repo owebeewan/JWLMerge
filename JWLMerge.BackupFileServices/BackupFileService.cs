@@ -482,6 +482,7 @@ public sealed class BackupFileService : IBackupFileService
             return;
         }
 
+        const string defaultThumb = "default_thumbnail.png";
         var fileTracker = new List<string>();
         using var targetFileStream = new FileStream(outputFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
         using var targetArchive = new ZipArchive(targetFileStream, ZipArchiveMode.Update);
@@ -504,6 +505,15 @@ public sealed class BackupFileService : IBackupFileService
                     sourceStream.CopyTo(targetStream);
                     fileTracker.Add(media.FilePath);
                 }
+            }
+
+            if (!fileTracker.Contains(defaultThumb) && sourceArchive.GetEntry(defaultThumb) is { } thumbEntry)
+            {
+                var targetEntry = targetArchive.CreateEntry(defaultThumb);
+                using var targetStream = targetEntry.Open();
+                using var sourceStream = thumbEntry.Open();
+                sourceStream.CopyTo(targetStream);
+                fileTracker.Add(defaultThumb);
             }
         }
     }

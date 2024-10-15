@@ -226,6 +226,12 @@ internal sealed class Merger
                 id = _translatedNoteIds.GetTranslatedId(sourceTagMap.NoteId.Value);
                 existingTagMap = destination.FindTagMapForNote(tagId, id);
             }
+            else if (sourceTagMap.PlaylistItemId != null)
+            {
+                // a tag on a playlist
+                id = _translatedPlaylistItemIds.GetTranslatedId(sourceTagMap.PlaylistItemId.Value);
+                existingTagMap = destination.FindTagMapForPlaylistItem(tagId, id);
+            }
 
             if (id != 0 && existingTagMap == null)
             {
