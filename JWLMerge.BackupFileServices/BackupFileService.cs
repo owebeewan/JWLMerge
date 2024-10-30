@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.IO.Pipes;
 using System.Linq;
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
 using JWLMerge.BackupFileServices.Events;
@@ -27,6 +30,7 @@ public sealed class BackupFileService : IBackupFileService
     private const int DatabaseVersionSupported = 14;
     private const string ManifestEntryName = "manifest.json";
     private const string DatabaseEntryName = "userData.db";
+    private const string DefaultThumb = "default_thumbnail.png";
 
     private readonly Merger _merger = new();
 
@@ -234,14 +238,15 @@ public sealed class BackupFileService : IBackupFileService
         string originalJwlibraryFilePathForSchema)
     {
         Clean(backup);
-        WriteNewDatabase(backup, newDatabaseFilePath, originalJwlibraryFilePathForSchema);
+        WriteNewBackup(backup, newDatabaseFilePath, originalJwlibraryFilePathForSchema, []);
     }
 
     /// <inheritdoc />
-    public void WriteNewDatabase(
+    public void WriteNewBackup(
         BackupFile backup,
         string newDatabaseFilePath,
-        string originalJwlibraryFilePathForSchema)
+        string originalJwlibraryFilePathForSchema,
+        IEnumerable<string> sourceFiles)
     {
         ArgumentNullException.ThrowIfNull(backup);
 
@@ -273,6 +278,8 @@ public sealed class BackupFileService : IBackupFileService
                                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                             }));
                 }
+
+                AddMediaToArchive(archive, sourceFiles, backup.Database.IndependentMedias);
 
                 AddDatabaseEntryToArchive(archive, backup.Database, tmpDatabaseFileName);
             }
@@ -472,50 +479,6 @@ public sealed class BackupFileService : IBackupFileService
     {
         var service = new NotesExporter();
         return service.ExportBibleNotes(backupFile, bibleNotesExportFilePath, exportService);
-    }
-
-    /// <inheritdoc />
-    public void WriteIndependentMedia(BackupFile backup, IEnumerable<string> sourceFiles, string outputFileName)
-    {
-        if (backup.Database.IndependentMedias.Count == 0)
-        {
-            return;
-        }
-
-        const string defaultThumb = "default_thumbnail.png";
-        var fileTracker = new List<string>();
-        using var targetFileStream = new FileStream(outputFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-        using var targetArchive = new ZipArchive(targetFileStream, ZipArchiveMode.Update);
-        foreach (var file in sourceFiles)
-        {
-            using var sourceFileStream = File.OpenRead(file);
-            using var sourceArchive = new ZipArchive(sourceFileStream, ZipArchiveMode.Read);
-            foreach (var media in backup.Database.IndependentMedias)
-            {
-                if (fileTracker.Contains(media.FilePath))
-                {
-                    continue;
-                }
-                
-                if (sourceArchive.GetEntry(media.FilePath) is { } entry)
-                {
-                    var targetEntry = targetArchive.CreateEntry(media.FilePath);
-                    using var targetStream = targetEntry.Open();
-                    using var sourceStream = entry.Open();
-                    sourceStream.CopyTo(targetStream);
-                    fileTracker.Add(media.FilePath);
-                }
-            }
-
-            if (!fileTracker.Contains(defaultThumb) && sourceArchive.GetEntry(defaultThumb) is { } thumbEntry)
-            {
-                var targetEntry = targetArchive.CreateEntry(defaultThumb);
-                using var targetStream = targetEntry.Open();
-                using var sourceStream = thumbEntry.Open();
-                sourceStream.CopyTo(targetStream);
-                fileTracker.Add(defaultThumb);
-            }
-        }
     }
 
     private static void RemoveSelectedTags(Database database, HashSet<int> tagIds)
@@ -819,9 +782,7 @@ public sealed class BackupFileService : IBackupFileService
 
         using var fs = new FileStream(databaseFilePath, FileMode.Open);
         using var bs = new BufferedStream(fs);
-#pragma warning disable SYSLIB0021
-        using var sha1 = new SHA256Managed();
-#pragma warning restore SYSLIB0021
+        using var sha1 = SHA256.Create();
 
         var hash = sha1.ComputeHash(bs);
         var sb = new StringBuilder(2 * hash.Length);
@@ -831,6 +792,14 @@ public sealed class BackupFileService : IBackupFileService
         }
 
         return sb.ToString();
+    }
+
+    private static string GenerateZipArchiveEntryHash(ZipArchiveEntry entry)
+    {
+        using var stream = entry.Open();
+        using var sha256 = SHA256.Create();
+        var hashBytes = sha256.ComputeHash(stream);
+        return BitConverter.ToString(hashBytes).Replace("-", "").ToLower(CultureInfo.InvariantCulture);
     }
 
     private void AddDatabaseEntryToArchive(
@@ -848,6 +817,50 @@ public sealed class BackupFileService : IBackupFileService
         finally
         {
             File.Delete(tmpDatabaseFile);
+        }
+    }
+
+    private void AddMediaToArchive(ZipArchive archive, IEnumerable<string> sourceFiles, IList<IndependentMedia> independentMedias)
+    {
+        if (!sourceFiles.Any() || !independentMedias.Any())
+        {
+            return;
+        }
+
+        ProgressMessage($"Adding independent media to archive");
+
+        var fileTracker = new List<string>();
+        foreach (var file in sourceFiles)
+        {
+            using var sourceFileStream = File.OpenRead(file);
+            using var sourceArchive = new ZipArchive(sourceFileStream, ZipArchiveMode.Read);
+            foreach (var media in independentMedias)
+            {
+                if (fileTracker.Contains(media.FilePath))
+                {
+                    continue;
+                }
+
+                if (sourceArchive.GetEntry(media.FilePath) is { } entry)
+                {
+                    var hash = GenerateZipArchiveEntryHash(entry);
+                    media.Hash = hash;
+                    var targetEntry = archive.CreateEntry(media.FilePath);
+                    using var targetStream = targetEntry.Open();
+                    using var sourceStream = entry.Open();
+                    sourceStream.CopyTo(targetStream);
+                    fileTracker.Add(media.FilePath);
+                }
+
+            }
+            if (!fileTracker.Contains(DefaultThumb) && sourceArchive.GetEntry(DefaultThumb) is { } thumbEntry)
+            {
+                var targetEntry = archive.CreateEntry(DefaultThumb);
+                using var targetStream = targetEntry.Open();
+                using var sourceStream = thumbEntry.Open();
+                sourceStream.CopyTo(targetStream);
+                fileTracker.Add(DefaultThumb);
+            }
         }
     }
 

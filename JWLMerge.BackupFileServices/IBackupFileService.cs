@@ -141,10 +141,12 @@ public interface IBackupFileService
     /// <param name="backup">The backup data.</param>
     /// <param name="newDatabaseFilePath">The new database file path.</param>
     /// <param name="originalJwlibraryFilePathForSchema">The original jwlibrary file path on which to base the new schema.</param>
-    void WriteNewDatabase(
+    /// <param name="sourceFiles">List of the source files for individual media extraction</param>
+    void WriteNewBackup(
         BackupFile backup,
         string newDatabaseFilePath,
-        string originalJwlibraryFilePathForSchema);
+        string originalJwlibraryFilePathForSchema,
+        IEnumerable<string> sourceFiles);
 
     /// <summary>
     /// Removes all the tags from the specified database.
@@ -187,12 +189,4 @@ public interface IBackupFileService
     /// <param name="database">The database.</param>
     /// <returns>Number of items removed</returns>
     int RemovePlaylists(Database database);
-
-    /// <summary>
-    /// Writes any independent media present in the backups
-    /// </summary>
-    /// <param name="backup">The overall backup file</param>
-    /// <param name="sourceFiles">The source files to retrieve files from</param>
-    /// <param name="outputFileName">The target file name to write the files to</param>
-    void WriteIndependentMedia(BackupFile backup, IEnumerable<string> sourceFiles, string outputFileName);
 }

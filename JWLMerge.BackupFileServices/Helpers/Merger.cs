@@ -433,7 +433,10 @@ internal sealed class Merger
 
             newMediaMap.PlaylistItemId = playlistItemId;
             newMediaMap.IndependentMediaId = independentMediaId;
-            destination.PlaylistItemIndependentMediaMaps.Add(newMediaMap);
+            if (destination.FindPlaylistItemIndependentMediaMapByValues(newMediaMap) == null)
+            {
+                destination.PlaylistItemIndependentMediaMaps.Add(newMediaMap);
+            }
         }
     }
 
@@ -539,6 +542,10 @@ internal sealed class Merger
             {
                 InsertIndependentMedia(independentMedia, destination);
             }
+            else
+            {
+                _translatedIndependentMediaIds.Add(independentMedia.IndependentMediaId, existingIndependentMedia.IndependentMediaId);
+            }
         }
     }
 
@@ -553,6 +560,10 @@ internal sealed class Merger
             {
                 // A new playlist item...
                 InsertPlaylistItem(playlistItem, destination);
+            }
+            else
+            {
+                _translatedPlaylistItemIds.Add(playlistItem.PlaylistItemId, existingPlaylistItem.PlaylistItemId);
             }
         }
     }
@@ -592,11 +603,7 @@ internal sealed class Merger
         foreach (var marker in source.PlaylistItemMarkers)
         {
             var existingMarker = destination.FindPlaylistItemMarker(marker.PlaylistItemMarkerId);
-            if (existingMarker != null)
-            {
-                continue;
-            }
-            else
+            if (existingMarker == null)
             {
                 InsertPlaylistItemMarker(marker, destination);
             }

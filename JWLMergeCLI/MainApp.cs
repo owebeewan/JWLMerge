@@ -24,8 +24,7 @@ internal sealed class MainApp
 
         var backup = backupFileService.Merge(args.BackupFiles);
         string outputFileName = args.OutputFilePath ?? $"{backup.Manifest.Name}.jwlibrary";
-        backupFileService.WriteNewDatabase(backup, outputFileName, args.BackupFiles[0]);
-        backupFileService.WriteIndependentMedia(backup, args.BackupFiles, outputFileName);
+        backupFileService.WriteNewBackup(backup, outputFileName, args.BackupFiles[0], args.BackupFiles);
 
         var logMessage = $"{args.BackupFiles.Length} backup files merged to {outputFileName}";
         Log.Logger.Information(logMessage);
