@@ -296,7 +296,7 @@ public class Database
         return _playlistItemIndependentMediaMapsValueIndex.Value.TryGetValue(key, out var map) ? map : null;
     }
 
-    public PlaylistItemMarker FindPlaylistItemMarker(int playlistItemMarkerId) => _playlistItemMarkersIdIndex.Value.TryGetValue(playlistItemMarkerId, out var marker) ? marker : null;
+    public PlaylistItemMarker? FindPlaylistItemMarker(int playlistItemMarkerId) => _playlistItemMarkersIdIndex.Value.TryGetValue(playlistItemMarkerId, out var marker) ? marker : null;
 
     public InputField? FindInputField(int locationId, string textTag)
     {
