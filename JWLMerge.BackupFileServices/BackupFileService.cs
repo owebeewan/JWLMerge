@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
-using System.IO.Pipes;
 using System.Linq;
-using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
 using JWLMerge.BackupFileServices.Events;
@@ -791,14 +788,6 @@ public sealed class BackupFileService : IBackupFileService
         return sb.ToString();
     }
 
-    private static string GenerateZipArchiveEntryHash(ZipArchiveEntry entry)
-    {
-        using var stream = entry.Open();
-        using var sha256 = SHA256.Create();
-        var hashBytes = sha256.ComputeHash(stream);
-        return Convert.ToHexStringLower(hashBytes);
-    }
-
     private void AddDatabaseEntryToArchive(
         ZipArchive archive,
         Database database,
@@ -840,8 +829,6 @@ public sealed class BackupFileService : IBackupFileService
 
                 if (sourceArchive.GetEntry(media.FilePath) is { } entry)
                 {
-                    var hash = GenerateZipArchiveEntryHash(entry);
-                    media.Hash = hash;
                     var targetEntry = archive.CreateEntry(media.FilePath);
                     using var targetStream = targetEntry.Open();
                     using var sourceStream = entry.Open();
