@@ -799,7 +799,7 @@ public sealed class BackupFileService : IBackupFileService
         using var stream = entry.Open();
         using var sha256 = SHA256.Create();
         var hashBytes = sha256.ComputeHash(stream);
-        return BitConverter.ToString(hashBytes).Replace("-", "").ToLower(CultureInfo.InvariantCulture);
+        return Convert.ToHexStringLower(hashBytes);
     }
 
     private void AddDatabaseEntryToArchive(
