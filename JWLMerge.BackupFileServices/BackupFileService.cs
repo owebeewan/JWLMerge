@@ -509,13 +509,10 @@ public sealed class BackupFileService : IBackupFileService
     {
         Log.Logger.Debug("Updating manifest");
 
-        Manifest result = manifestToBaseOn.Clone();
+        var result = manifestToBaseOn.Clone();
 
-        DateTime now = DateTime.Now;
-        string simpleDateString = $"{now.Year}-{now.Month:D2}-{now.Day:D2}";
-
-        result.Name = $"merged_{simpleDateString}";
-        result.CreationDate = simpleDateString;
+        result.Name = $"JWLMerge";
+        result.CreationDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture);
         result.UserDataBackup.DeviceName = "JWLMerge";
         result.UserDataBackup.DatabaseName = DatabaseEntryName;
 
