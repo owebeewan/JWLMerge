@@ -458,7 +458,10 @@ internal sealed class Merger
 
             newLocationMap.PlaylistItemId = playlistItemId;
             newLocationMap.LocationId = locationId;
-            destination.PlaylistItemLocationMaps.Add(newLocationMap);
+            if (destination.FindPlaylistItemLocationMapByValues(newLocationMap) == null)
+            {
+                destination.PlaylistItemLocationMaps.Add(newLocationMap);
+            }
         }
     }
 
@@ -596,10 +599,18 @@ internal sealed class Merger
 
         foreach (var playlistItemLocationMap in source.PlaylistItemLocationMaps)
         {
-            var existingPlaylistItemLocationMap = destination.FindPlaylistItemLocationMapByValues(playlistItemLocationMap);
-            if (existingPlaylistItemLocationMap == null)
+            var location = source.FindLocation(playlistItemLocationMap.LocationId);
+            if (location != null)
             {
+                InsertLocation(location, destination);
                 InsertPlaylistItemLocationMap(playlistItemLocationMap, destination);
+            }
+            else
+            {
+                if (location == null)
+                {
+                    Log.Logger.Error($"Could not find location {playlistItemLocationMap.LocationId} for playlist item {playlistItemLocationMap.PlaylistItemId}");
+                }
             }
         }
     }
