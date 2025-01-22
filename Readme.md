@@ -1,5 +1,9 @@
 # JWLMerge <img src="https://ci.appveyor.com/api/projects/status/2nl90i7apndaxcac?svg=true">
 
+## FORKED VERSION
+
+This is a fork of the original [JWLMerge project](https://github.com/AntonyCorbett/JWLMerge) which is now archived. I've continued updating and maintaining the project to keep it working with the latest JW Library backup file format. I've also added some new features and improvements based on my own usage.
+
 ### Introduction
 
 JWLMerge is a utility to merge 2 or more .jwlibrary backup files. These backup files are created using the JW Library® backup command, and contain your personal notes, highlighting, etc.

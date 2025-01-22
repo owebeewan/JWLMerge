@@ -1,6 +1,6 @@
 #define MyAppName "JWLMerge"
-#define MyAppPublisher "Antony Corbett"
-#define MyAppURL "https://github.com/AntonyCorbett/JWLMerge"
+#define MyAppPublisher "Antony Corbett | DavidIQ"
+#define MyAppURL "https://github.com/DavidIQ/JWLMerge"
 #define MyAppExeName "JWLMerge.exe"
 
 #define MyAppVersion GetFileVersion('Staging\JWLMerge.exe');
@@ -19,7 +19,7 @@ OutputBaseFilename=JWLMergeSetup
 SetupIconFile=..\JWLMerge.ico
 Compression=lzma
 SolidCompression=yes
-AppContact=antony@corbetts.org.uk
+AppContact=https://www.davidiq.com/support/memberlist.php?mode=contactadmin
 DisableWelcomePage=false
 SetupLogging=True
 RestartApplications=False
