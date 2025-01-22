@@ -367,7 +367,15 @@ internal sealed class Merger
         }
         else if (tagMap.PlaylistItemId != null)
         {
-            newTagMap.PlaylistItemId = _translatedPlaylistItemIds.GetTranslatedId(tagMap.PlaylistItemId.Value);
+            // avoid duplicates here
+            var playListItemId = _translatedPlaylistItemIds.GetTranslatedId(tagMap.PlaylistItemId.Value);
+            var tagMapPlaylistItemIds = destination.TagMaps.Where(t => t.TagId == newTagMap.TagId).Select(t => t.PlaylistItemId);
+            var playListItems = destination.PlaylistItems.Where(p => tagMapPlaylistItemIds.Contains(p.PlaylistItemId) || p.PlaylistItemId == playListItemId);
+            var currPlayListItem = playListItems.FirstOrDefault(p => p.PlaylistItemId == playListItemId);
+            if (!playListItems.Any(t => t.PlaylistItemId != playListItemId && t.Label == currPlayListItem?.Label && t.ThumbnailFilePath == currPlayListItem.ThumbnailFilePath))
+            {
+                newTagMap.PlaylistItemId = playListItemId;
+            }
         }
 
         if (newTagMap.LocationId != null || newTagMap.NoteId != null || newTagMap.PlaylistItemId != null)
