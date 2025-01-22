@@ -3,7 +3,7 @@
 #define MyAppURL "https://github.com/DavidIQ/JWLMerge"
 #define MyAppExeName "JWLMerge.exe"
 
-#define MyAppVersion GetFileVersion('Staging\JWLMerge.exe');
+#define MyAppVersion GetVersionNumbersString('Staging\JWLMerge.exe');
 
 [Setup]
 AppId={{53082E90-DEA3-405D-B4C8-6495076D3D98}
