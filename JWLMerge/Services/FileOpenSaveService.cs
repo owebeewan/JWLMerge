@@ -5,7 +5,6 @@ using Microsoft.Win32;
 
 namespace JWLMerge.Services;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 internal sealed class FileOpenSaveService : IFileOpenSaveService
 {
     private static string? ImportDirectory { get; set; }

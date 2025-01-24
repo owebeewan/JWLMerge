@@ -20,25 +20,31 @@ using JWLMerge.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
 using JWLMerge.EventTracking;
 using Microsoft.AppCenter;
+using System.Runtime.Versioning;
 
 namespace JWLMerge;
 
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-#pragma warning disable CA1001 // Types that own disposable fields should be disposable
-public partial class App
-#pragma warning restore CA1001 // Types that own disposable fields should be disposable
+public partial class App : IDisposable
 {
     private readonly string _appString = "JWLMergeAC";
     private Mutex? _appMutex;
 
     protected override void OnExit(ExitEventArgs e)
     {
-        _appMutex?.Dispose();
+        Dispose();
         Log.Logger.Information("==== Exit ====");
     }
-        
+
+    public void Dispose()
+    {
+        _appMutex?.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    [SupportedOSPlatform("windows7.0")]
     protected override void OnStartup(StartupEventArgs e)
     {
         ConfigureAppCenter();
@@ -77,6 +83,7 @@ public partial class App
         Current.Shutdown();
     }
 
+    [SupportedOSPlatform("windows7.0")]
     private static void ConfigureServices()
     {
         var serviceCollection = new ServiceCollection();

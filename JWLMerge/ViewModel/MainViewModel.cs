@@ -26,7 +26,6 @@ using Tag = JWLMerge.BackupFileServices.Models.DatabaseModels.Tag;
 
 namespace JWLMerge.ViewModel;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 internal sealed class MainViewModel : ObservableObject
 {
     private readonly string _latestReleaseUrl = Properties.Resources.LATEST_RELEASE_URL;
@@ -174,7 +173,6 @@ internal sealed class MainViewModel : ObservableObject
         HomepageCommand = new RelayCommand(LaunchHomepage);
         UpdateCommand = new RelayCommand(LaunchLatestReleasePage);
 
-        // ReSharper disable AsyncVoidLambda
         RemoveFavouritesCommand = new RelayCommand<string>(async filePath => await RemoveFavouritesAsync(filePath), _ => !IsBusy);
         RedactNotesCommand = new RelayCommand<string>(async filePath => await RedactNotesAsync(filePath), _ => !IsBusy);
         ImportBibleNotesCommand = new RelayCommand<string>(async filePath => await ImportBibleNotesAsync(filePath), _ => !IsBusy);
@@ -182,7 +180,6 @@ internal sealed class MainViewModel : ObservableObject
         RemoveNotesByTagCommand = new RelayCommand<string>(async filePath => await RemoveNotesByTagAsync(filePath), _ => !IsBusy);
         RemoveUnderliningByColourCommand = new RelayCommand<string>(async filePath => await RemoveUnderliningByColourAsync(filePath), _ => !IsBusy);
         RemoveUnderliningByPubAndColourCommand = new RelayCommand<string>(async filePath => await RemoveUnderliningByPubAndColourAsync(filePath), _ => !IsBusy);
-        // ReSharper restore AsyncVoidLambda
     }
 
     private async Task ExportBibleNotesAsync(string? filePath)
@@ -640,9 +637,7 @@ internal sealed class MainViewModel : ObservableObject
         Process.Start(psi);
     }
 
-#pragma warning disable U2U1003 // Avoid declaring methods used in delegate constructors static
     private static void LaunchHomepage()
-#pragma warning restore U2U1003 // Avoid declaring methods used in delegate constructors static
     {
         var psi = new ProcessStartInfo
         {

@@ -20,9 +20,7 @@ internal static class DesignTimeFileCreation
             DeviceName = "MYPC",
         };
 
-#pragma warning disable S1075 // URIs should not be hardcoded
         return new JwLibraryFile("c:\\temp\\myfile.jwlibrary", file);
-#pragma warning restore S1075 // URIs should not be hardcoded
     }
 
     private static string GenerateDateString(DateTime dateTime)

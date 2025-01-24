@@ -9,7 +9,6 @@ using JWLMerge.Models;
 
 namespace JWLMerge.ViewModel;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 internal sealed class DetailViewModel : ObservableObject
 {
     private DataTypeListItem? _selectedDataType;
@@ -77,9 +76,7 @@ internal sealed class DetailViewModel : ObservableObject
         }
     }
 
-#pragma warning disable U2U1200 // Prefer generic collections over non-generic ones
     public IEnumerable? DataItemsSource
-#pragma warning restore U2U1200 // Prefer generic collections over non-generic ones
     {
         get
         {
@@ -124,9 +121,7 @@ internal sealed class DetailViewModel : ObservableObject
                 }
             }
 
-#pragma warning disable S1168 // Empty arrays and collections should be returned instead of null
             return null;
-#pragma warning restore S1168 // Empty arrays and collections should be returned instead of null
         }
     }
 

@@ -1,10 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Runtime.Versioning;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
 
 namespace JWLMerge.ViewModel;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+[SupportedOSPlatform("windows7.0")]
 internal sealed class RemoveFavouritesPromptViewModel : ObservableObject
 {
     public RemoveFavouritesPromptViewModel()
@@ -22,16 +23,12 @@ internal sealed class RemoveFavouritesPromptViewModel : ObservableObject
     private void No()
     {
         Result = false;
-#pragma warning disable CA1416
         DialogHost.CloseDialogCommand.Execute(null, null);
-#pragma warning restore CA1416
     }
 
     private void Yes()
     {
         Result = true;
-#pragma warning disable CA1416
         DialogHost.CloseDialogCommand.Execute(null, null);
-#pragma warning restore CA1416
     }
 }
