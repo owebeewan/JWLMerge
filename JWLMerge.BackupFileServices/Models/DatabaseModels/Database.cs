@@ -33,6 +33,8 @@ public class Database
     private Lazy<Dictionary<string, PlaylistItem>> _playlistItemsValueIndex = null!;
     private Lazy<Dictionary<string, PlaylistItemIndependentMediaMap>> _playlistItemIndependentMediaMapsValueIndex = null!;
     private Lazy<Dictionary<int, PlaylistItemMarker>> _playlistItemMarkersIdIndex = null!;
+    private Lazy<Dictionary<int, PlaylistItemMarkerBibleVerseMap>> _playlistItemMarkersBibleVerseMapIndex = null!;
+    private Lazy<Dictionary<int, PlaylistItemMarkerParagraphMap>> _playlistItemMarkersParagraphMapIndex = null!;
     private Lazy<Dictionary<string, PlaylistItemLocationMap>> _playlistItemLocationMapsValueIndex = null!;
 
     public Database()
@@ -67,6 +69,10 @@ public class Database
     public List<PlaylistItemLocationMap> PlaylistItemLocationMaps { get; } = [];
 
     public List<PlaylistItemMarker> PlaylistItemMarkers { get; } = [];
+
+    public List<PlaylistItemMarkerBibleVerseMap> PlaylistItemMarkerBibleVerseMaps { get; } = [];
+
+    public List<PlaylistItemMarkerParagraphMap> PlaylistItemMarkerParagraphMaps { get; } = [];
 
     public static string GetDateTimeUtcAsDbString(DateTime dateTime)
     {
@@ -297,6 +303,10 @@ public class Database
     }
 
     public PlaylistItemMarker? FindPlaylistItemMarker(int playlistItemMarkerId) => _playlistItemMarkersIdIndex.Value.TryGetValue(playlistItemMarkerId, out var marker) ? marker : null;
+
+    public PlaylistItemMarkerBibleVerseMap? FindPlaylistItemMarkerBibleVerseMap(int playlistItemMarkerId) => _playlistItemMarkersBibleVerseMapIndex.Value.TryGetValue(playlistItemMarkerId, out var map) ? map : null;
+
+    public PlaylistItemMarkerParagraphMap? FindPlaylistItemMarkerParagraphMap(int playlistItemMarkerId) => _playlistItemMarkersParagraphMapIndex.Value.TryGetValue(playlistItemMarkerId, out var map) ? map : null;
 
     public InputField? FindInputField(int locationId, string textTag)
     {
@@ -608,6 +618,8 @@ public class Database
         _playlistItemsValueIndex = new Lazy<Dictionary<string, PlaylistItem>>(PlaylistItemsValueIndexFactory);
         _playlistItemIndependentMediaMapsValueIndex = new Lazy<Dictionary<string, PlaylistItemIndependentMediaMap>>(PlaylistItemIndependentMediaMapsValueIndexFactory);
         _playlistItemMarkersIdIndex = new Lazy<Dictionary<int, PlaylistItemMarker>>(() => PlaylistItemMarkers.ToDictionary(marker => marker.PlaylistItemMarkerId));
+        _playlistItemMarkersBibleVerseMapIndex = new Lazy<Dictionary<int, PlaylistItemMarkerBibleVerseMap>>(() => PlaylistItemMarkerBibleVerseMaps.ToDictionary(marker => marker.PlaylistItemMarkerId));
+        _playlistItemMarkersParagraphMapIndex = new Lazy<Dictionary<int, PlaylistItemMarkerParagraphMap>>(() => PlaylistItemMarkerParagraphMaps.ToDictionary(marker => marker.PlaylistItemMarkerId));
         _playlistItemLocationMapsValueIndex = new Lazy<Dictionary<string, PlaylistItemLocationMap>>(PlaylistItemLocationMapsValueFactory);
     }
 

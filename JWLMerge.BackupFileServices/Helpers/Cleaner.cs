@@ -23,6 +23,8 @@ internal sealed class Cleaner(Database database)
                CleanLocations() +
                CleanIndependentMedias() +
                CleanPlaylistItemMarkers() +
+               CleanPlaylistItemMarkerBibleVerseMaps() +
+               CleanPlaylistItemMarkerParagraphMaps() +
                CleanPlaylistItemLocationMaps() +
                CleanPlaylistItemIndependentMediaMaps() +
                CleanPlaylistItems();
@@ -257,6 +259,54 @@ internal sealed class Cleaner(Database database)
     }
 
     /// <summary>
+    /// Clean playlist item marker bible verse maps
+    /// </summary>
+    /// <returns>Number of removed playlist item marker bible verses</returns>
+    private int CleanPlaylistItemMarkerBibleVerseMaps()
+    {
+        int removed = 0;
+        var maps = database.PlaylistItemMarkerBibleVerseMaps;
+        if (maps.Count != 0)
+        {
+            var markerIds = GetValidPlaylistItemMarkerIds();
+            foreach (var map in Enumerable.Reverse(maps))
+            {
+                if (!markerIds.Contains(map.PlaylistItemMarkerId))
+                {
+                    Log.Logger.Debug($"Removing redundant playlist item marker bible verse map: {map.PlaylistItemMarkerId}");
+                    maps.Remove(map);
+                    ++removed;
+                }
+            }
+        }
+        return removed;
+    }
+
+    /// <summary>
+    /// Clean playlist item marker paragraph maps
+    /// </summary>
+    /// <returns>Number of removed playlist item marker paragraphs</returns>
+    private int CleanPlaylistItemMarkerParagraphMaps()
+    {
+        int removed = 0;
+        var maps = database.PlaylistItemMarkerParagraphMaps;
+        if (maps.Count != 0)
+        {
+            var markerIds = GetValidPlaylistItemMarkerIds();
+            foreach (var map in Enumerable.Reverse(maps))
+            {
+                if (!markerIds.Contains(map.PlaylistItemMarkerId))
+                {
+                    Log.Logger.Debug($"Removing redundant playlist item marker paragraph map: {map.PlaylistItemMarkerId}");
+                    maps.Remove(map);
+                    ++removed;
+                }
+            }
+        }
+        return removed;
+    }
+
+    /// <summary>
     /// Clean playlist item location maps
     /// </summary>
     /// <returns>Number of removed item location maps</returns>
@@ -335,6 +385,16 @@ internal sealed class Cleaner(Database database)
 
         Log.Logger.Debug($"Found {result.Count} playlist item Ids in use");
 
+        return result;
+    }
+
+    private HashSet<int> GetValidPlaylistItemMarkerIds()
+    {
+        var result = new HashSet<int>();
+        foreach (var marker in database.PlaylistItemMarkers)
+        {
+            result.Add(marker.PlaylistItemMarkerId);
+        }
         return result;
     }
 

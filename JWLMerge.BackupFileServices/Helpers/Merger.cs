@@ -18,6 +18,7 @@ internal sealed class Merger
     private readonly IdTranslator _translatedNoteIds = new();
     private readonly IdTranslator _translatedIndependentMediaIds = new();
     private readonly IdTranslator _translatedPlaylistItemIds = new();
+    private readonly IdTranslator _translatedPlaylistItemMarkerIds = new();
 
     private int _maxLocationId;
     private int _maxUserMarkId;
@@ -82,6 +83,8 @@ internal sealed class Merger
         MergePlaylistItemIndependentMediaMaps(source, destination);
         MergePlaylistItemLocationMap(source, destination);
         MergePlaylistItemMarker(source, destination);
+        MergePlaylistItemMarkerBibleVerseMap(source, destination);
+        MergePlaylistItemMarkerParagraphMap(source, destination);
         MergeTags(source, destination);
         MergeTagMap(source, destination);
         MergeBlockRanges(source, destination);
@@ -99,6 +102,7 @@ internal sealed class Merger
         _translatedNoteIds.Clear();
         _translatedIndependentMediaIds.Clear();
         _translatedPlaylistItemIds.Clear();
+        _translatedPlaylistItemMarkerIds.Clear();
     }
 
     private void MergeBookmarks(Database source, Database destination)
@@ -475,6 +479,7 @@ internal sealed class Merger
             newMarker.PlaylistItemMarkerId = ++_maxPlaylistItemMarkerId;
             newMarker.PlaylistItemId = playlistItemId;
             destination.PlaylistItemMarkers.Add(newMarker);
+            _translatedPlaylistItemMarkerIds.Add(marker.PlaylistItemMarkerId, newMarker.PlaylistItemMarkerId);
         }
     }
 
@@ -625,6 +630,44 @@ internal sealed class Merger
             if (existingMarker == null)
             {
                 InsertPlaylistItemMarker(marker, destination);
+            }
+        }
+    }
+
+    private void MergePlaylistItemMarkerBibleVerseMap(Database source, Database destination)
+    {
+        ProgressMessage(" Playlist Item Marker Bible Verse Maps");
+        foreach (var markerBibleVerseMap in source.PlaylistItemMarkerBibleVerseMaps)
+        {
+            var existingMarker = destination.FindPlaylistItemMarker(markerBibleVerseMap.PlaylistItemMarkerId);
+            if (existingMarker == null)
+            {
+                var playlistItemMarkerId = _translatedPlaylistItemMarkerIds.GetTranslatedId(markerBibleVerseMap.PlaylistItemMarkerId);
+                if (playlistItemMarkerId > 0)
+                {
+                    var newMap = markerBibleVerseMap.Clone();
+                    newMap.PlaylistItemMarkerId = playlistItemMarkerId;
+                    destination.PlaylistItemMarkerBibleVerseMaps.Add(newMap);
+                }
+            }
+        }
+    }
+
+    private void MergePlaylistItemMarkerParagraphMap(Database source, Database destination)
+    {
+        ProgressMessage(" Playlist Item Marker Paragraph Maps");
+        foreach (var markerParagraphMap in source.PlaylistItemMarkerParagraphMaps)
+        {
+            var existingMarker = destination.FindPlaylistItemMarker(markerParagraphMap.PlaylistItemMarkerId);
+            if (existingMarker == null)
+            {
+                var playlistItemMarkerId = _translatedPlaylistItemMarkerIds.GetTranslatedId(markerParagraphMap.PlaylistItemMarkerId);
+                if (playlistItemMarkerId > 0)
+                {
+                    var newMap = markerParagraphMap.Clone();
+                    newMap.PlaylistItemMarkerId = playlistItemMarkerId;
+                    destination.PlaylistItemMarkerParagraphMaps.Add(newMap);
+                }
             }
         }
     }

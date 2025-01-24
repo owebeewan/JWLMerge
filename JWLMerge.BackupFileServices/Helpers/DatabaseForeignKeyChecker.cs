@@ -18,6 +18,8 @@ internal static class DatabaseForeignKeyChecker
         CheckPlaylistItemIndependentMediaMapValidity(database);
         CheckPlaylistItemLocationMapValidity(database);
         CheckPlaylistItemMarkerValidity(database);
+        CheckPlaylistItemMarkerParagraphMapValidity(database);
+        CheckPlaylistItemMarkerBibleVerseMapValidity(database);
     }
 
     private static void CheckBlockRangeValidity(Database database)
@@ -173,6 +175,28 @@ internal static class DatabaseForeignKeyChecker
             if (database.FindPlaylistItem(playlistItemMarker.PlaylistItemId) == null)
             {
                 throw new BackupFileServicesException($"Could not find playlist item for marker {playlistItemMarker.PlaylistItemMarkerId}");
+            }
+        }
+    }
+
+    private static void CheckPlaylistItemMarkerParagraphMapValidity(Database database)
+    {
+        foreach (var playlistItemMarkerParagraphMap in database.PlaylistItemMarkerParagraphMaps)
+        {
+            if (database.FindPlaylistItemMarker(playlistItemMarkerParagraphMap.PlaylistItemMarkerId) == null)
+            {
+                throw new BackupFileServicesException($"Could not find playlist item marker for paragraph map {playlistItemMarkerParagraphMap.PlaylistItemMarkerId}");
+            }
+        }
+    }
+
+    private static void CheckPlaylistItemMarkerBibleVerseMapValidity(Database database)
+    {
+        foreach (var playlistItemMarkerBibleVerseMap in database.PlaylistItemMarkerBibleVerseMaps)
+        {
+            if (database.FindPlaylistItemMarker(playlistItemMarkerBibleVerseMap.PlaylistItemMarkerId) == null)
+            {
+                throw new BackupFileServicesException($"Could not find playlist item marker for bible verse map {playlistItemMarkerBibleVerseMap.PlaylistItemMarkerId}");
             }
         }
     }

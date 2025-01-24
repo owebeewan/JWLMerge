@@ -46,6 +46,8 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         PopulateTable(connection, dataToUse.PlaylistItemIndependentMediaMaps);
         PopulateTable(connection, dataToUse.PlaylistItemLocationMaps);
         PopulateTable(connection, dataToUse.PlaylistItemMarkers);
+        PopulateTable(connection, dataToUse.PlaylistItemMarkerBibleVerseMaps);
+        PopulateTable(connection, dataToUse.PlaylistItemMarkerParagraphMaps);
         PopulateTable(connection, dataToUse.TagMaps);
         PopulateTable(connection, dataToUse.InputFields);
         PopulateTable(connection, dataToUse.Bookmarks);
@@ -78,6 +80,8 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         result.PlaylistItemIndependentMediaMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemIndependentMediaMap));
         result.PlaylistItemLocationMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemLocationMap));
         result.PlaylistItemMarkers.AddRange(ReadAllRows(connection, ReadPlaylistItemMarker));
+        result.PlaylistItemMarkerBibleVerseMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemMarkerBibleVerseMap));
+        result.PlaylistItemMarkerParagraphMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemMarkerParagraphMap));
 
         // ensure bookmarks appear in similar order to original.
         result.Bookmarks.Sort((bookmark1, bookmark2) => bookmark1.Slot.CompareTo(bookmark2.Slot));
@@ -155,6 +159,8 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         ClearTable(connection, "UserMark");
         ClearTable(connection, "PlaylistItemLocationMap");
         ClearTable(connection, "Location");
+        ClearTable(connection, "PlaylistItemMarkerBibleVerseMap");
+        ClearTable(connection, "PlaylistItemMarkerParagraphMap");
         ClearTable(connection, "PlaylistItemMarker");
         ClearTable(connection, "PlaylistItemIndependentMediaMap");
         ClearTable(connection, "PlaylistItem");
@@ -398,6 +404,22 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             StartTimeTicks = ReadInt(reader, "StartTimeTicks"),
             DurationTicks = ReadInt(reader, "DurationTicks"),
             EndTransitionDurationTicks = ReadInt(reader, "EndTransitionDurationTicks"),
+        };
+
+    private PlaylistItemMarkerBibleVerseMap ReadPlaylistItemMarkerBibleVerseMap(SqliteDataReader reader)
+        => new()
+        {
+            PlaylistItemMarkerId = ReadInt(reader, "PlaylistItemMarkerId"),
+            VerseId = ReadInt(reader, "VerseId"),
+        };
+
+    private PlaylistItemMarkerParagraphMap ReadPlaylistItemMarkerParagraphMap(SqliteDataReader reader)
+        => new()
+        {
+            PlaylistItemMarkerId = ReadInt(reader, "PlaylistItemMarkerId"),
+            MepsDocumentId = ReadInt(reader, "MepsDocumentId"),
+            ParagraphIndex = ReadInt(reader, "ParagraphIndex"),
+            MarkerIndexWithinParagraph = ReadInt(reader, "MarkerIndexWithinParagraph"),
         };
 
     private SqliteConnection CreateConnection() => CreateConnection(databaseFilePath);
