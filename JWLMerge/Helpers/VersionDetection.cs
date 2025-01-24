@@ -27,7 +27,7 @@ internal static class VersionDetection
                     var segments = latestVersionUri.Segments;
                     if (segments.Length != 0)
                     {
-                        version = segments[^1];
+                        version = segments[^1].Replace("v", "");
                     }
                 }
             }
