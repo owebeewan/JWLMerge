@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JWLMerge.BackupFileServices.Models.DatabaseModels;
 using Serilog;
-using System.Linq.Expressions;
 
 namespace JWLMerge.BackupFileServices.Helpers;
 
@@ -177,7 +176,7 @@ internal sealed class DataAccessLayer
 
         cmd.CommandText = $"select * from {tableName}";
         Log.Logger.Debug($"SQL: {cmd.CommandText}");
-
+                
         using (var reader = cmd.ExecuteReader())
         {
             while (reader.Read())
@@ -187,7 +186,7 @@ internal sealed class DataAccessLayer
         }
 
         Log.Logger.Debug($"SQL result set count: {result.Count}");
-
+                
         return result;
     }
 
