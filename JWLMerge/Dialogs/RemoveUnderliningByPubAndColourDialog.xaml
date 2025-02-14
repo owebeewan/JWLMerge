@@ -1,0 +1,114 @@
+﻿<UserControl x:Class="JWLMerge.Dialogs.RemoveUnderliningByPubAndColourDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             DataContext="{Binding RemoveUnderliningByPubAndColourDialog, Source={StaticResource Locator}}"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
+             TextElement.FontWeight="Medium"
+             TextElement.FontSize="14"
+             TextOptions.TextFormattingMode="Ideal"
+             TextOptions.TextRenderingMode="Auto"
+             Width="460"
+             Height="370"
+             Background="{StaticResource MaterialDesignPaper}"
+             FontFamily="{StaticResource MaterialDesignFont}">
+
+    <UserControl.Resources>
+        <Style x:Key="BtnStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedLightButton}">
+            <Setter Property="Width" Value="125"/>
+        </Style>
+        <Style x:Key="OkBtnStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedAccentButton}">
+            <Setter Property="Margin" Value="0,0,10,0"/>
+            <Setter Property="Width" Value="125"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Padding="20,20,20,10">
+        <StackPanel Orientation="Vertical">
+            <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                       Margin="0,0,0,10"
+                       Text="Removing Underlining by Publication/Colour" />
+
+            <TextBlock 
+                Style="{StaticResource MaterialDesignBody2TextBlock}"
+                Margin="0,0,0,10"
+                TextWrapping="Wrap"
+                Text="Remove all underlining associated with a Publication and Colour" />
+
+            <TextBlock 
+                Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                TextWrapping="Wrap"
+                Margin="0,0,0,10"
+                Text="Removes all underlining that is associated with the selected Publication and Colour and then overwrites the original backup file." />
+
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
+
+                <ComboBox ItemsSource="{Binding PublicationList}" 
+                              Margin="10,10,10,10"
+                              Width="250"
+                              Style="{StaticResource MaterialDesignComboBox}"
+                              materialDesign:HintAssist.Hint="Publication"
+                              DisplayMemberPath="KeySymbol"
+                              SelectedItem="{Binding SelectedPublication}" />
+                
+                <ComboBox ItemsSource="{Binding ColourItems}" 
+                              Margin="10,10,10,0"
+                              Width="250"
+                              Style="{StaticResource MaterialDesignComboBox}"
+                              materialDesign:HintAssist.Hint="Colour"
+                              SelectedItem="{Binding SelectedColour}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="22"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Width="14" HorizontalAlignment="Left" Height="14" BorderBrush="Gray" BorderThickness="0.5">
+                                    <Border.Background>
+                                        <SolidColorBrush Color="{Binding Color}" />
+                                    </Border.Background>
+                                </Border>
+
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    
+                </ComboBox>
+
+                <CheckBox
+                    Margin="10,30,0,0"
+                    IsChecked="{Binding RemoveAssociatedNotes}"
+                    Style="{StaticResource MaterialDesignCheckBox}">
+                    Remove associated notes
+                </CheckBox>
+
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center" 
+                        Margin="0,60,0,0" >
+
+                <Button Style="{StaticResource OkBtnStyle}"
+                        Command="{Binding OkCommand}"
+                        IsEnabled="{Binding SelectionMade}"
+                        Content="OK">
+                </Button>
+
+                <Button Style="{StaticResource BtnStyle}" 
+                        HorizontalAlignment="Right"
+                        IsDefault="true" 
+                        Command="{Binding CancelCommand}"
+                        IsCancel="true" 
+                        Content="CANCEL">
+                </Button>
+
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>
