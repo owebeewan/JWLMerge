@@ -181,7 +181,7 @@
                 Drag and drop .jwlibrary files here
             </TextBlock>
 
-
+            
             <ScrollViewer
                 Grid.Row="0"
                 AllowDrop="True"
@@ -203,6 +203,17 @@
                 VerticalAlignment="Stretch"
                 Mode="PrimaryLight">
                 <DockPanel>
+                    <Button
+                        Margin="0,0,10,0"
+                        Command="{Binding BrowseCommand}"
+                        Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
+                        DockPanel.Dock="Left">
+                            <materialDesign:PackIcon
+                                Width="22"
+                                Height="22"
+                                Kind="FileSearch"
+                                ToolTip="Browse for backup file(s)" />
+                    </Button>
                     <Button
                         Width="110"
                         Margin="0,0,10,0"

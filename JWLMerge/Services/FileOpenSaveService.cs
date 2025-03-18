@@ -97,6 +97,26 @@ internal sealed class FileOpenSaveService : IFileOpenSaveService
         return null;
     }
 
+    public string[]? GetOpenFiles(string title)
+    {
+        var openFileDialog = new OpenFileDialog
+        {
+            Multiselect = true,
+            CheckFileExists = true,
+            CheckPathExists = true,
+            Title = "Select one or more JW Library backup files",
+            Filter = "JW Library backup file (*.jwlibrary)|*.jwlibrary",
+            InitialDirectory = Properties.Settings.Default.SaveDirectory ?? GetDefaultSaveFolder(),
+        };
+        if (openFileDialog.ShowDialog() == true)
+        {
+            Properties.Settings.Default.SaveDirectory = Path.GetDirectoryName(openFileDialog.FileName);
+            Properties.Settings.Default.Save();
+            return openFileDialog.FileNames;
+        }
+        return null;
+    }
+
     private static string GetJwlMergeDocsFolder()
     {
         var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "JWLMerge");

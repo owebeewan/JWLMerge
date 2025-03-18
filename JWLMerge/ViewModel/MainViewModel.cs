@@ -23,6 +23,7 @@ using JWLMerge.Messages;
 using JWLMerge.Models;
 using JWLMerge.Services;
 using Tag = JWLMerge.BackupFileServices.Models.DatabaseModels.Tag;
+using System.Collections.Generic;
 
 namespace JWLMerge.ViewModel;
 
@@ -122,6 +123,8 @@ internal sealed class MainViewModel : ObservableObject
 
     public RelayCommand UpdateCommand { get; private set; } = null!;
 
+    public RelayCommand BrowseCommand { get; private set; } = null!;
+
     public RelayCommand<string> RemoveFavouritesCommand { get; private set; } = null!;
 
     public RelayCommand<string> RedactNotesCommand { get; private set; } = null!;
@@ -172,6 +175,7 @@ internal sealed class MainViewModel : ObservableObject
         MergeCommand = new RelayCommand(MergeFiles, () => GetMergeableFileCount() > 0 && !IsBusy && !_dialogService.IsDialogVisible());
         HomepageCommand = new RelayCommand(LaunchHomepage);
         UpdateCommand = new RelayCommand(LaunchLatestReleasePage);
+        BrowseCommand = new RelayCommand(BrowseForFiles);
 
         RemoveFavouritesCommand = new RelayCommand<string>(async filePath => await RemoveFavouritesAsync(filePath), _ => !IsBusy);
         RedactNotesCommand = new RelayCommand<string>(async filePath => await RedactNotesAsync(filePath), _ => !IsBusy);
@@ -648,6 +652,12 @@ internal sealed class MainViewModel : ObservableObject
         Process.Start(psi);
     }
 
+    private void BrowseForFiles()
+    {
+        var files = _fileOpenSaveService.GetOpenFiles("Select one or more JW Library backup files");
+        AddFiles(files);
+    }
+
     private void PrepareForMerge()
     {
         ReloadFiles();
@@ -836,10 +846,19 @@ internal sealed class MainViewModel : ObservableObject
 
     private void HandleDroppedFiles(DragEventArgs dragEventArgs)
     {
+        var jwLibraryFiles = _dragDropService.GetDroppedFiles(dragEventArgs);
+        AddFiles(jwLibraryFiles);
+    }
+
+    private void AddFiles(IEnumerable<string>? jwLibraryFiles)
+    {
+        if (jwLibraryFiles == null)
+        {
+            return;
+        }
+
         var tmpFilesCollection = new ConcurrentBag<JwLibraryFile>();
 
-        var jwLibraryFiles = _dragDropService.GetDroppedFiles(dragEventArgs);
-            
         Parallel.ForEach(jwLibraryFiles, file =>
         {
             var backupFile = _backupFileService.Load(file);
