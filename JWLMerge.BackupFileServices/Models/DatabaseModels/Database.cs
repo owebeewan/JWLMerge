@@ -520,7 +520,7 @@ public class Database
 
     private static string GetLocationByBibleChapterKey(int bibleBookNumber, int chapterNumber, string? bibleKeySymbol) => $"{bibleBookNumber}-{chapterNumber}-{bibleKeySymbol ?? string.Empty}";
 
-    private static string GetPlaylistItemLocationMapKey(PlaylistItemLocationMap locationMap) => $"{locationMap.PlaylistItemId}|{locationMap.LocationId}";
+    private static string GetPlaylistItemLocationMapKey(PlaylistItemLocationMap locationMap) => $"locationid-{locationMap.LocationId}";
 
     private static string GetPlaylistItemByValueKey(PlaylistItem playlistItem) => $"{playlistItem.Label}|{playlistItem.ThumbnailFilePath}";
 
