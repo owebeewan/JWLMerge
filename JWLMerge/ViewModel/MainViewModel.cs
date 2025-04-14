@@ -24,6 +24,7 @@ using JWLMerge.Models;
 using JWLMerge.Services;
 using Tag = JWLMerge.BackupFileServices.Models.DatabaseModels.Tag;
 using System.Collections.Generic;
+using JWLMerge.BackupFileServices.Models;
 
 namespace JWLMerge.ViewModel;
 
@@ -682,6 +683,7 @@ internal sealed class MainViewModel : ObservableObject
         IsBusy = true;
 
         EventTracker.TrackMerge(Files.Count);
+        BackupFile? mergedFile = null;
 
         Task.Run(() =>
         {
@@ -690,9 +692,9 @@ internal sealed class MainViewModel : ObservableObject
             {
                 var schemaFilePath = GetSuitableFilePathForSchema();
 
-                if (schemaFilePath != null)
+                if (!string.IsNullOrEmpty(schemaFilePath))
                 {
-                    var mergedFile = _backupFileService.Merge(Files.Select(x => x.BackupFile).ToArray());
+                    mergedFile = _backupFileService.Merge(Files.Select(x => x.BackupFile).ToArray());
                     _backupFileService.WriteNewBackup(mergedFile, destPath, schemaFilePath, Files.Select(x => x.FilePath));
                     _snackbarService.Enqueue("Merged successfully");
                 }
@@ -717,7 +719,7 @@ internal sealed class MainViewModel : ObservableObject
             }
         }).ContinueWith(_ => Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
-                if (File.Exists(destPath) && MessageBox.Show(Application.Current.MainWindow, "Open merged file?", "Merged successfully", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                if (mergedFile != null && File.Exists(destPath) && MessageBox.Show(Application.Current.MainWindow, "Open merged file?", "Merged successfully", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
                 {
                     Process.Start(new ProcessStartInfo(destPath) { UseShellExecute = true });
                 }
