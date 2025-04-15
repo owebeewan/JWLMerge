@@ -216,19 +216,12 @@ internal sealed class MainViewModel : ObservableObject
 
             await Task.Run(() =>
             {
-                switch (exportFileType)
+                exportService = exportFileType switch
                 {
-                    case ImportExportFileType.Text:
-                        exportService = new TextFileService();
-                        break;
-
-                    case ImportExportFileType.Excel:
-                        exportService = new ExcelService();
-                        break;
-
-                    default:
-                        throw new NotSupportedException();
-                }
+                    ImportExportFileType.Text => new TextFileService(),
+                    ImportExportFileType.Excel => new ExcelService(),
+                    _ => throw new NotSupportedException(),
+                };
             });
 
             var result = _backupFileService.ExportBibleNotes(
@@ -683,7 +676,6 @@ internal sealed class MainViewModel : ObservableObject
         IsBusy = true;
 
         EventTracker.TrackMerge(Files.Count);
-        BackupFile? mergedFile = null;
 
         Task.Run(() =>
         {
@@ -694,9 +686,22 @@ internal sealed class MainViewModel : ObservableObject
 
                 if (!string.IsNullOrEmpty(schemaFilePath))
                 {
-                    mergedFile = _backupFileService.Merge(Files.Select(x => x.BackupFile).ToArray());
+                    var mergedFile = _backupFileService.Merge(Files.Select(x => x.BackupFile).ToArray());
                     _backupFileService.WriteNewBackup(mergedFile, destPath, schemaFilePath, Files.Select(x => x.FilePath));
-                    _snackbarService.Enqueue("Merged successfully");
+                    _snackbarService.Enqueue(
+                        "Merged successfully",
+                        "Open Merged File",
+                        _ =>
+                        {
+                            if (mergedFile is not null && !string.IsNullOrEmpty(destPath))
+                            {
+                                Process.Start(new ProcessStartInfo(destPath) { UseShellExecute = true });
+                            }
+                        },
+                        null,
+                        false,
+                        false,
+                        TimeSpan.FromMinutes(5));
                 }
             }
             catch (UnauthorizedAccessException ex)
@@ -717,14 +722,7 @@ internal sealed class MainViewModel : ObservableObject
                 // applying any merge parameters.
                 ReloadFiles();
             }
-        }).ContinueWith(_ => Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                if (mergedFile != null && File.Exists(destPath) && MessageBox.Show(Application.Current.MainWindow, "Open merged file?", "Merged successfully", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
-                {
-                    Process.Start(new ProcessStartInfo(destPath) { UseShellExecute = true });
-                }
-                IsBusy = false;
-            })));
+        }).ContinueWith(_ => Application.Current.Dispatcher.BeginInvoke(new Action(() => IsBusy = false)));
     }
 
     private void ApplyMergeParameters()

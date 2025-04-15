@@ -19,9 +19,10 @@ public sealed class SnackbarService : ISnackbarService, IDisposable
         object content,
         object actionContent,
         Action<object?> actionHandler,
-        object actionArgument,
+        object? actionArgument,
         bool promote,
-        bool neverConsiderToBeDuplicate)
+        bool neverConsiderToBeDuplicate,
+        TimeSpan? durationOverride = null)
     {
         TheSnackbarMessageQueue.Enqueue(
             content,
@@ -29,7 +30,8 @@ public sealed class SnackbarService : ISnackbarService, IDisposable
             actionHandler,
             actionArgument,
             promote,
-            neverConsiderToBeDuplicate);
+            neverConsiderToBeDuplicate,
+            durationOverride);
     }
 
     public void Enqueue(object content)
