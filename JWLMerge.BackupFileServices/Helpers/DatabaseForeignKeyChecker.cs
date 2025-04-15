@@ -142,12 +142,12 @@ internal static class DatabaseForeignKeyChecker
         {
             if (database.FindPlaylistItem(playlistItemIndependentMediaMap.PlaylistItemId) == null)
             {
-                throw new BackupFileServicesException($"Could not find playlist item for independent media {playlistItemIndependentMediaMap.IndependentMediaId}");
+                throw new BackupFileServicesException($"Could not find playlist item map for independent media {playlistItemIndependentMediaMap.IndependentMediaId}");
             }
 
             if (database.FindIndependentMedia(playlistItemIndependentMediaMap.IndependentMediaId) == null)
             {
-                throw new BackupFileServicesException($"Could not find independent media for playlist item {playlistItemIndependentMediaMap.PlaylistItemId}");
+                throw new BackupFileServicesException($"Could not find independent media for playlist item map {playlistItemIndependentMediaMap.PlaylistItemId}");
             }
         }
     }

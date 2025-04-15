@@ -17,6 +17,7 @@ internal sealed class Merger
     private readonly IdTranslator _translatedUserMarkIds = new();
     private readonly IdTranslator _translatedNoteIds = new();
     private readonly IdTranslator _translatedIndependentMediaIds = new();
+    private readonly Dictionary<string, string> _translatedIndependentMediaFilePaths = new();
     private readonly IdTranslator _translatedPlaylistItemIds = new();
     private readonly IdTranslator _translatedPlaylistItemMarkerIds = new();
 
@@ -90,6 +91,8 @@ internal sealed class Merger
         MergeBlockRanges(source, destination);
         MergeBookmarks(source, destination);
 
+        PlaylistItemsCleanup(destination);
+
         ProgressMessage(" Checking validity");
         destination.CheckValidity();
     }
@@ -101,8 +104,49 @@ internal sealed class Merger
         _translatedUserMarkIds.Clear();
         _translatedNoteIds.Clear();
         _translatedIndependentMediaIds.Clear();
+        _translatedIndependentMediaFilePaths.Clear();
         _translatedPlaylistItemIds.Clear();
         _translatedPlaylistItemMarkerIds.Clear();
+    }
+
+    /// <summary>
+    /// Ensure a map or reference exists for each playlist item
+    /// </summary>
+    /// <param name="destination">The destination database to check</param>
+    private static void PlaylistItemsCleanup(Database destination)
+    {
+        var itemsToRemove = new List<PlaylistItem>();
+        foreach (var playlistItem in destination.PlaylistItems)
+        {
+            if (destination.PlaylistItemIndependentMediaMaps.Any(mm => mm.PlaylistItemId == playlistItem.PlaylistItemId))
+            {
+                continue;
+            }
+
+            if (destination.PlaylistItemLocationMaps.Any(lm => lm.PlaylistItemId == playlistItem.PlaylistItemId))
+            {
+                continue;
+            }
+
+            if (destination.PlaylistItemMarkers.Any(m => m.PlaylistItemId != playlistItem.PlaylistItemId))
+            {
+                continue;
+            }
+
+            itemsToRemove.Add(playlistItem);
+        }
+
+        foreach (var item in itemsToRemove)
+        {
+            // Remove from tag maps as well
+            var tagMap = destination.TagMaps.FirstOrDefault(tm => tm.PlaylistItemId == item.PlaylistItemId);
+            if (tagMap != null)
+            {
+                destination.TagMaps.Remove(tagMap);
+            }
+
+            destination.PlaylistItems.Remove(item);
+        }
     }
 
     private void MergeBookmarks(Database source, Database destination)
@@ -243,14 +287,13 @@ internal sealed class Merger
             }
         }
 
-        NormaliseTagMapPositions(destination.TagMaps);
+        NormaliseTagMaps(destination.TagMaps);
     }
 
-    private static void NormaliseTagMapPositions(List<TagMap> entries)
+    private static void NormaliseTagMaps(List<TagMap> entries)
     {
         // there is unique constraint on TagId, Position
         var tmpStorage = entries.GroupBy(x => x.TagId).ToDictionary(x => x.Key);
-
         foreach (var item in tmpStorage)
         {
             var pos = 0;
@@ -258,6 +301,13 @@ internal sealed class Merger
             {
                 entry.Position = pos++;
             }
+        }
+
+        // re-ID all entries
+        var id = 1;
+        foreach (var entry in entries)
+        {
+            entry.TagMapId = id++;
         }
     }
 
@@ -380,6 +430,11 @@ internal sealed class Merger
             {
                 newTagMap.PlaylistItemId = playListItemId;
             }
+            else if (currPlayListItem != null)
+            {
+                _translatedPlaylistItemIds.Remove(tagMap.PlaylistItemId.Value);
+                destination.PlaylistItems.Remove(currPlayListItem);
+            }
         }
 
         if (newTagMap.LocationId != null || newTagMap.NoteId != null || newTagMap.PlaylistItemId != null)
@@ -418,17 +473,33 @@ internal sealed class Merger
 
     private void InsertIndependentMedia(IndependentMedia independentMedia, Database destination)
     {
-        var newIndependentMedia = independentMedia.Clone();
-        newIndependentMedia.IndependentMediaId = ++_maxIndependentMediaId;
+        var existing = destination.FindIndependentMediaByHash(independentMedia.Hash);
 
-        destination.IndependentMedias.Add(newIndependentMedia);
-        _translatedIndependentMediaIds.Add(independentMedia.IndependentMediaId, newIndependentMedia.IndependentMediaId);
+        if (existing != null)
+        {
+            if (!_translatedIndependentMediaFilePaths.ContainsKey(existing.FilePath))
+            {
+                _translatedIndependentMediaFilePaths.Add(independentMedia.FilePath, existing.FilePath);
+            }
+        }
+        else
+        {
+            var newIndependentMedia = independentMedia.Clone();
+            newIndependentMedia.IndependentMediaId = ++_maxIndependentMediaId;
+
+            destination.IndependentMedias.Add(newIndependentMedia);
+            _translatedIndependentMediaIds.Add(independentMedia.IndependentMediaId, newIndependentMedia.IndependentMediaId);
+        }
     }
 
     private void InsertPlaylistItem(PlaylistItem playlistItem, Database destination)
     {
         var newPlaylistItem = playlistItem.Clone();
         newPlaylistItem.PlaylistItemId = ++_maxPlaylistItemId;
+        if (!string.IsNullOrEmpty(newPlaylistItem.ThumbnailFilePath))
+        {
+            newPlaylistItem.ThumbnailFilePath = _translatedIndependentMediaFilePaths.TryGetValue(newPlaylistItem.ThumbnailFilePath, out var filePath) ? filePath : newPlaylistItem.ThumbnailFilePath;
+        }
 
         destination.PlaylistItems.Add(newPlaylistItem);
         _translatedPlaylistItemIds.Add(playlistItem.PlaylistItemId, newPlaylistItem.PlaylistItemId);
@@ -594,6 +665,18 @@ internal sealed class Merger
             if (existingMediaMap == null)
             {
                 InsertPlaylistItemIndependentMediaMap(mediaMap, destination);
+            }
+        }
+
+        // Check for any missing maps
+        var playlistItemsWithFile = destination.PlaylistItems.Where(p => !string.IsNullOrEmpty(p.ThumbnailFilePath));
+        foreach (var playlistItem in playlistItemsWithFile)
+        {
+            var independentMedia = destination.IndependentMedias.FirstOrDefault(m => m.FilePath == playlistItem.ThumbnailFilePath);
+            if (independentMedia != null && independentMedia.IndependentMediaId > 0 && !destination.PlaylistItemIndependentMediaMaps.Any(m => m.PlaylistItemId == playlistItem.PlaylistItemId))
+            {
+                var newMediaMap = new PlaylistItemIndependentMediaMap { PlaylistItemId = playlistItem.PlaylistItemId, IndependentMediaId = independentMedia.IndependentMediaId, DurationTicks = 40000000 };
+                InsertPlaylistItemIndependentMediaMap(newMediaMap, destination);
             }
         }
     }

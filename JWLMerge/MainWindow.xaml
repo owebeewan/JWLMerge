@@ -178,7 +178,7 @@
                 Margin="10"
                 Style="{StaticResource MaterialDesignBody1TextBlock}"
                 Visibility="{Binding Path=FileListEmpty, Converter={StaticResource BoolToVis}, Mode=OneWay}">
-                Drag and drop .jwlibrary files here
+                Drag and drop .jwlibrary files here or click the browse button
             </TextBlock>
 
             

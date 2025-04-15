@@ -11,21 +11,14 @@ internal sealed class IdTranslator
 
     public IdTranslator()
     {
-        _ids = new Dictionary<int, int>();
+        _ids = [];
     }
 
-    public int GetTranslatedId(int oldId)
-    {
-        return _ids.TryGetValue(oldId, out var translatedId) ? translatedId : 0;
-    }
+    public int GetTranslatedId(int oldId) => _ids.TryGetValue(oldId, out var translatedId) ? translatedId : 0;
 
-    public void Add(int oldId, int translatedId)
-    {
-        _ids[oldId] = translatedId;
-    }
+    public void Add(int oldId, int translatedId) => _ids[oldId] = translatedId;
 
-    public void Clear()
-    {
-        _ids.Clear();
-    }
+    public void Remove(int oldId) => _ids.Remove(oldId);
+
+    public void Clear() => _ids.Clear();
 }

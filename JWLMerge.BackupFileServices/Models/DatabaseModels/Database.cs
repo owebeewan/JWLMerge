@@ -28,6 +28,7 @@ public class Database
     private Lazy<Dictionary<int, List<BlockRange>>> _blockRangesUserMarkIdIndex = null!;
     private Lazy<Dictionary<string, Bookmark>> _bookmarksIndex = null!;
     private Lazy<Dictionary<string, IndependentMedia>> _independentMediasFilePathIndex = null!;
+    private Lazy<Dictionary<string, IndependentMedia>> _independentMediasHashIndex = null!;
     private Lazy<Dictionary<int, IndependentMedia>> _independentMediasIdIndex = null!;
     private Lazy<Dictionary<int, PlaylistItem>> _playlistItemsIdIndex = null!;
     private Lazy<Dictionary<string, PlaylistItem>> _playlistItemsValueIndex = null!;
@@ -270,6 +271,8 @@ public class Database
     public IndependentMedia? FindIndependentMedia(string filePath) => _independentMediasFilePathIndex.Value.TryGetValue(filePath, out var media) ? media : null;
 
     public IndependentMedia? FindIndependentMedia(int mediaId) => _independentMediasIdIndex.Value.TryGetValue(mediaId, out var media) ? media : null;
+   
+    public IndependentMedia? FindIndependentMediaByHash(string hash) => _independentMediasHashIndex.Value.TryGetValue(hash, out var mediaFromHash) ? mediaFromHash : null;
 
     public PlaylistItem? FindPlaylistItem(int playlistId) => _playlistItemsIdIndex.Value.TryGetValue(playlistId, out var playlist) ? playlist : null;
 
@@ -613,6 +616,7 @@ public class Database
         _blockRangesUserMarkIdIndex = new Lazy<Dictionary<int, List<BlockRange>>>(BlockRangeIndexValueFactory);
         _bookmarksIndex = new Lazy<Dictionary<string, Bookmark>>(BookmarkIndexValueFactory);
         _independentMediasFilePathIndex = new Lazy<Dictionary<string, IndependentMedia>>(() => IndependentMedias.ToDictionary(media => media.FilePath.Trim()));
+        _independentMediasHashIndex = new Lazy<Dictionary<string, IndependentMedia>>(() => IndependentMedias.ToDictionary(media => media.Hash.Trim()));
         _independentMediasIdIndex = new Lazy<Dictionary<int, IndependentMedia>>(() => IndependentMedias.ToDictionary(media => media.IndependentMediaId));
         _playlistItemsIdIndex = new Lazy<Dictionary<int, PlaylistItem>>(() => PlaylistItems.ToDictionary(playlist => playlist.PlaylistItemId));
         _playlistItemsValueIndex = new Lazy<Dictionary<string, PlaylistItem>>(PlaylistItemsValueIndexFactory);
