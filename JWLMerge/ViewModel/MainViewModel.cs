@@ -701,7 +701,7 @@ internal sealed class MainViewModel : ObservableObject
                         null,
                         false,
                         false,
-                        TimeSpan.FromMinutes(5));
+                        TimeSpan.FromSeconds(30));
                 }
             }
             catch (UnauthorizedAccessException ex)
