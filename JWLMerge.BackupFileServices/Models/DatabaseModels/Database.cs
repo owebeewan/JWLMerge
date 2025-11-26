@@ -228,6 +228,32 @@ public class Database
         }
     }
 
+    public void AddPlaylistItemIndependentMediaMapAndUpdateIndex(PlaylistItemIndependentMediaMap value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        PlaylistItemIndependentMediaMaps.Add(value);
+
+        if (_playlistItemIndependentMediaMapsValueIndex.IsValueCreated)
+        {
+            var key = GetPlaylistItemIndependentMediaMapKey(value);
+            _playlistItemIndependentMediaMapsValueIndex.Value.TryAdd(key, value);
+        }
+    }
+
+    public void AddPlaylistItemLocationMapAndUpdateIndex(PlaylistItemLocationMap value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        PlaylistItemLocationMaps.Add(value);
+
+        if (_playlistItemLocationMapsValueIndex.IsValueCreated)
+        {
+            var key = GetPlaylistItemLocationMapKey(value);
+            _playlistItemLocationMapsValueIndex.Value.TryAdd(key, value);
+        }
+    }
+
     public Note? FindNote(string noteGuid)
     {
         if (!Guid.TryParse(noteGuid, out var g))

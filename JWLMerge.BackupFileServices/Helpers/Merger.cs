@@ -518,7 +518,7 @@ internal sealed class Merger
             newMediaMap.IndependentMediaId = independentMediaId;
             if (destination.FindPlaylistItemIndependentMediaMapByValues(newMediaMap) == null)
             {
-                destination.PlaylistItemIndependentMediaMaps.Add(newMediaMap);
+                destination.AddPlaylistItemIndependentMediaMapAndUpdateIndex(newMediaMap);
             }
         }
     }
@@ -535,7 +535,7 @@ internal sealed class Merger
             newLocationMap.LocationId = locationId;
             if (destination.FindPlaylistItemLocationMapByValues(newLocationMap) == null)
             {
-                destination.PlaylistItemLocationMaps.Add(newLocationMap);
+                destination.AddPlaylistItemLocationMapAndUpdateIndex(newLocationMap);
             }
         }
     }
