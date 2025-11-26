@@ -235,7 +235,7 @@ public sealed class BackupFileService : IBackupFileService
         string originalJwlibraryFilePathForSchema)
     {
         Clean(backup);
-        WriteNewBackup(backup, newDatabaseFilePath, originalJwlibraryFilePathForSchema, []);
+        WriteNewBackup(backup, newDatabaseFilePath, originalJwlibraryFilePathForSchema, [backup.FilePath]);
     }
 
     /// <inheritdoc />
