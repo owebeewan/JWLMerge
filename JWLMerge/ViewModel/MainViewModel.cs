@@ -815,7 +815,7 @@ internal sealed class MainViewModel : ObservableObject
     {
         Title = IsInDesignMode()
             ? "JWL Merge (design mode)"
-            : "JWL Merge";
+            : $"JWL Merge [{VersionDetection.GetCurrentVersion()}]";
     }
 
     private void OnDragOver(object recipient, DragOverMessage message)
