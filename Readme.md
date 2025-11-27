@@ -2,7 +2,7 @@
 
 ## FORKED VERSION
 
-This is a fork of the original [JWLMerge project](https://github.com/AntonyCorbett/JWLMerge) which is now archived. I've continued updating and maintaining the project to keep it working with the latest JW Library backup file format. I've also added some new features and improvements based on my own usage.
+This is a fork of the original [JWLMerge project](https://github.com/AntonyCorbett/JWLMerge) which is now purged or inaccessible. I've continued updating and maintaining the project to keep it working with the latest JW Library backup file format. I've also added some new features and improvements based on my own usage.
 
 ### Introduction
 
@@ -20,7 +20,7 @@ https://github.com/DavidIQ/JWLMerge/releases/latest
 
 **Please see the wiki for further information:**
 
-https://github.com/AntonyCorbett/JWLMerge/wiki
+https://github.com/SuperJC710e/JWLMerge/wiki
 
 #### Command-line
 
