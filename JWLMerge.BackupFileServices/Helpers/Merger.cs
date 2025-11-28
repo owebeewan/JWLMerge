@@ -430,11 +430,6 @@ internal sealed class Merger
             {
                 newTagMap.PlaylistItemId = playListItemId;
             }
-            else if (currPlayListItem != null)
-            {
-                _translatedPlaylistItemIds.Remove(tagMap.PlaylistItemId.Value);
-                destination.PlaylistItems.Remove(currPlayListItem);
-            }
         }
 
         if (newTagMap.LocationId != null || newTagMap.NoteId != null || newTagMap.PlaylistItemId != null)
