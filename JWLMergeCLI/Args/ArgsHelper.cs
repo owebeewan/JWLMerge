@@ -65,4 +65,16 @@ internal static class ArgsHelper
         var ext = Path.GetExtension(filePath);
         return ext.Equals(".jwlibrary", StringComparison.OrdinalIgnoreCase);
     }
+
+    private static string GetDefaultImportFolder()
+    {
+        var folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        if (!Directory.Exists(folder))
+        {
+            Directory.CreateDirectory(folder);
+        }
+
+        return folder;
+    }
+
 }

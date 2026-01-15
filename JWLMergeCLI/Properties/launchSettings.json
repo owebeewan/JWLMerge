@@ -2,8 +2,8 @@
   "profiles": {
     "JWLMergeCLI": {
       "commandName": "Project",
-      "commandLineArgs": "UserdataBackup_2025-02-12_JHWH.jwlibrary\r\nUserdataBackup_2025-02-12_SURFACE11.jwlibrary\r\nUserdataBackup_2025-02-12_iPhone.jwlibrary",
-      "workingDirectory": "C:\\Users\\Wes\\OneDrive\\Documents\\JW Lib Backups\\",
+      "commandLineArgs": "UserdataBackup_2025-12-21_JW.jwlibrary\r\nUserdataBackup_2025-12-21_JHWH.jwlibrary\r\nUserdataBackup_2025-12-21_iPhone.jwlibrary\r\nUserdataBackup_2025-12-21_SURFACE11.jwlibrary",
+      "workingDirectory": "C:\\Users\\Wes\\OneDrive - DoctorWes\\Documents\\JW Lib Backups",
       "sqlDebugging": true
     }
   }
