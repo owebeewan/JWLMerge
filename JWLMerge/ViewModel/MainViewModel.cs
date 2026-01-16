@@ -23,10 +23,11 @@ using JWLMerge.Messages;
 using JWLMerge.Models;
 using JWLMerge.Services;
 using Tag = JWLMerge.BackupFileServices.Models.DatabaseModels.Tag;
+using System.Collections.Generic;
+using JWLMerge.BackupFileServices.Models;
 
 namespace JWLMerge.ViewModel;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 internal sealed class MainViewModel : ObservableObject
 {
     private readonly string _latestReleaseUrl = Properties.Resources.LATEST_RELEASE_URL;
@@ -39,7 +40,7 @@ internal sealed class MainViewModel : ObservableObject
     private bool _isBusy;
 
     public MainViewModel(
-        IDragDropService dragDropService, 
+        IDragDropService dragDropService,
         IBackupFileService backupFileService,
         IWindowService windowService,
         IFileOpenSaveService fileOpenSaveService,
@@ -52,7 +53,7 @@ internal sealed class MainViewModel : ObservableObject
         _fileOpenSaveService = fileOpenSaveService;
         _dialogService = dialogService;
         _snackbarService = snackbarService;
-        
+
         Files.CollectionChanged += FilesCollectionChanged;
 
         SetTitle();
@@ -61,7 +62,7 @@ internal sealed class MainViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<DragOverMessage>(this, OnDragOver);
         WeakReferenceMessenger.Default.Register<DragDropMessage>(this, OnDragDrop);
         WeakReferenceMessenger.Default.Register<MainWindowClosingMessage>(this, OnMainWindowClosing);
-            
+
         AddDesignTimeItems();
 
         InitCommands();
@@ -123,6 +124,8 @@ internal sealed class MainViewModel : ObservableObject
 
     public RelayCommand UpdateCommand { get; private set; } = null!;
 
+    public RelayCommand BrowseCommand { get; private set; } = null!;
+
     public RelayCommand<string> RemoveFavouritesCommand { get; private set; } = null!;
 
     public RelayCommand<string> RedactNotesCommand { get; private set; } = null!;
@@ -158,7 +161,7 @@ internal sealed class MainViewModel : ObservableObject
     }
 
     private void FilesCollectionChanged(
-        object? sender, 
+        object? sender,
         System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(FileListEmpty));
@@ -173,8 +176,8 @@ internal sealed class MainViewModel : ObservableObject
         MergeCommand = new RelayCommand(MergeFiles, () => GetMergeableFileCount() > 0 && !IsBusy && !_dialogService.IsDialogVisible());
         HomepageCommand = new RelayCommand(LaunchHomepage);
         UpdateCommand = new RelayCommand(LaunchLatestReleasePage);
+        BrowseCommand = new RelayCommand(BrowseForFiles);
 
-        // ReSharper disable AsyncVoidLambda
         RemoveFavouritesCommand = new RelayCommand<string>(async filePath => await RemoveFavouritesAsync(filePath), _ => !IsBusy);
         RedactNotesCommand = new RelayCommand<string>(async filePath => await RedactNotesAsync(filePath), _ => !IsBusy);
         ImportBibleNotesCommand = new RelayCommand<string>(async filePath => await ImportBibleNotesAsync(filePath), _ => !IsBusy);
@@ -182,7 +185,6 @@ internal sealed class MainViewModel : ObservableObject
         RemoveNotesByTagCommand = new RelayCommand<string>(async filePath => await RemoveNotesByTagAsync(filePath), _ => !IsBusy);
         RemoveUnderliningByColourCommand = new RelayCommand<string>(async filePath => await RemoveUnderliningByColourAsync(filePath), _ => !IsBusy);
         RemoveUnderliningByPubAndColourCommand = new RelayCommand<string>(async filePath => await RemoveUnderliningByPubAndColourAsync(filePath), _ => !IsBusy);
-        // ReSharper restore AsyncVoidLambda
     }
 
     private async Task ExportBibleNotesAsync(string? filePath)
@@ -209,29 +211,22 @@ internal sealed class MainViewModel : ObservableObject
         try
         {
             EventTracker.Track(EventName.ExportNotes);
-            
+
             IExportToFileService? exportService = null;
 
             await Task.Run(() =>
             {
-                switch (exportFileType)
+                exportService = exportFileType switch
                 {
-                    case ImportExportFileType.Text:
-                        exportService = new TextFileService();
-                        break;
-
-                    case ImportExportFileType.Excel:
-                        exportService = new ExcelService();
-                        break;
-
-                    default:
-                        throw new NotSupportedException();
-                }
+                    ImportExportFileType.Text => new TextFileService(),
+                    ImportExportFileType.Excel => new ExcelService(),
+                    _ => throw new NotSupportedException(),
+                };
             });
 
             var result = _backupFileService.ExportBibleNotes(
                 file.BackupFile, bibleNotesExportFilePath, exportService!);
-            
+
             switch (result)
             {
                 case { NoNotesFound: true }:
@@ -266,7 +261,7 @@ internal sealed class MainViewModel : ObservableObject
         {
             return;
         }
-            
+
         var bibleNotesImportFilePath = _fileOpenSaveService.GetBibleNotesImportFilePath("Bible Notes File");
         if (string.IsNullOrWhiteSpace(bibleNotesImportFilePath))
         {
@@ -293,7 +288,7 @@ internal sealed class MainViewModel : ObservableObject
             await Task.Run(() =>
             {
                 var notesFile = new BibleNotesFile(bibleNotesImportFilePath);
-                
+
                 foreach (var section in notesFile.GetPubSymbolsAndLanguages())
                 {
                     _backupFileService.ImportBibleNotes(
@@ -341,10 +336,10 @@ internal sealed class MainViewModel : ObservableObject
         {
             return;
         }
-            
+
         var colors = ColourHelper.GetHighlighterColoursInUse(file.BackupFile.Database.UserMarks, true);
         var pubs = PublicationHelper.GetPublications(file.BackupFile.Database.Locations, file.BackupFile.Database.UserMarks, true);
-            
+
         var result = await _dialogService.GetPubAndColourSelectionForUnderlineRemovalAsync(pubs, colors);
         if (result == null || result.IsInvalid)
         {
@@ -401,17 +396,17 @@ internal sealed class MainViewModel : ObservableObject
         {
             return;
         }
-            
-        if (!file.BackupFile.Database.UserMarks.Any())
+
+        if (file.BackupFile.Database.UserMarks.Count == 0)
         {
             _snackbarService.Enqueue("There is no underlining in the backup file!");
             return;
         }
-            
+
         var colors = ColourHelper.GetHighlighterColoursInUse(file.BackupFile.Database.UserMarks, false);
 
         var result = await _dialogService.GetColourSelectionForUnderlineRemovalAsync(colors);
-        if (result.ColourIndexes == null || !result.ColourIndexes.Any())
+        if (result.ColourIndexes == null || result.ColourIndexes.Length == 0)
         {
             return;
         }
@@ -474,7 +469,7 @@ internal sealed class MainViewModel : ObservableObject
 
         var result = await _dialogService.GetTagSelectionForNotesRemovalAsync(tags, includeUntaggedNotes);
 
-        if (!result.RemoveUntaggedNotes && (result.TagIds == null || !result.TagIds.Any()))
+        if (!result.RemoveUntaggedNotes && (result.TagIds == null || result.TagIds.Length == 0))
         {
             return;
         }
@@ -489,9 +484,9 @@ internal sealed class MainViewModel : ObservableObject
             await Task.Run(() =>
             {
                 notesRemovedCount = _backupFileService.RemoveNotesByTag(
-                    file.BackupFile, 
-                    result.TagIds, 
-                    result.RemoveUntaggedNotes, 
+                    file.BackupFile,
+                    result.TagIds,
+                    result.RemoveUntaggedNotes,
                     result.RemoveAssociatedUnderlining,
                     result.RemoveAssociatedTags);
 
@@ -503,7 +498,7 @@ internal sealed class MainViewModel : ObservableObject
 
             _windowService.Close(filePath!);
 
-            _snackbarService.Enqueue(notesRemovedCount == 0 
+            _snackbarService.Enqueue(notesRemovedCount == 0
                 ? "There were no notes to remove!"
                 : $"{notesRemovedCount} notes removed successfully");
 
@@ -532,7 +527,7 @@ internal sealed class MainViewModel : ObservableObject
         var file = GetFile(filePath);
 
         var notes = file?.BackupFile.Database.Notes;
-        if (notes == null || !notes.Any())
+        if (notes == null || notes.Count == 0)
         {
             _snackbarService.Enqueue("No notes found");
             return;
@@ -584,7 +579,7 @@ internal sealed class MainViewModel : ObservableObject
     private async Task RemoveFavouritesAsync(string? filePath)
     {
         var file = GetFile(filePath);
-            
+
         var favourites = file?.BackupFile.Database.TagMaps.Where(x => x.TagId == 1);
         if (favourites == null || !favourites.Any())
         {
@@ -640,9 +635,7 @@ internal sealed class MainViewModel : ObservableObject
         Process.Start(psi);
     }
 
-#pragma warning disable U2U1003 // Avoid declaring methods used in delegate constructors static
     private static void LaunchHomepage()
-#pragma warning restore U2U1003 // Avoid declaring methods used in delegate constructors static
     {
         var psi = new ProcessStartInfo
         {
@@ -651,6 +644,12 @@ internal sealed class MainViewModel : ObservableObject
         };
 
         Process.Start(psi);
+    }
+
+    private void BrowseForFiles()
+    {
+        var files = _fileOpenSaveService.GetOpenFiles("Select one or more JW Library backup files");
+        AddFiles(files);
     }
 
     private void PrepareForMerge()
@@ -673,7 +672,7 @@ internal sealed class MainViewModel : ObservableObject
         {
             return;
         }
-            
+
         IsBusy = true;
 
         EventTracker.TrackMerge(Files.Count);
@@ -685,11 +684,24 @@ internal sealed class MainViewModel : ObservableObject
             {
                 var schemaFilePath = GetSuitableFilePathForSchema();
 
-                if (schemaFilePath != null)
+                if (!string.IsNullOrEmpty(schemaFilePath))
                 {
                     var mergedFile = _backupFileService.Merge(Files.Select(x => x.BackupFile).ToArray());
-                    _backupFileService.WriteNewDatabase(mergedFile, destPath, schemaFilePath);
-                    _snackbarService.Enqueue("Merged successfully");
+                    _backupFileService.WriteNewBackup(mergedFile, destPath, schemaFilePath, Files.Select(x => x.FilePath));
+                    _snackbarService.Enqueue(
+                        "Merged successfully",
+                        "Open Merged File",
+                        _ =>
+                        {
+                            if (mergedFile is not null && !string.IsNullOrEmpty(destPath))
+                            {
+                                Process.Start(new ProcessStartInfo(destPath) { UseShellExecute = true });
+                            }
+                        },
+                        null,
+                        false,
+                        false,
+                        TimeSpan.FromSeconds(30));
                 }
             }
             catch (UnauthorizedAccessException ex)
@@ -721,7 +733,7 @@ internal sealed class MainViewModel : ObservableObject
             {
                 MergePreparation.ApplyMergeParameters(
                     _backupFileService,
-                    file.BackupFile.Database, 
+                    file.BackupFile.Database,
                     file.MergeParameters);
             }
         });
@@ -747,7 +759,7 @@ internal sealed class MainViewModel : ObservableObject
                 return file.FilePath;
             }
         }
-                
+
         return null;
     }
 
@@ -787,7 +799,7 @@ internal sealed class MainViewModel : ObservableObject
                 file.NotesRedacted);
         }
     }
-        
+
     private void AddDesignTimeItems()
     {
         if (IsInDesignMode())
@@ -798,12 +810,12 @@ internal sealed class MainViewModel : ObservableObject
             }
         }
     }
-        
+
     private void SetTitle()
     {
         Title = IsInDesignMode()
             ? "JWL Merge (design mode)"
-            : "JWL Merge";
+            : $"JWL Merge [{VersionDetection.GetCurrentVersion()}]";
     }
 
     private void OnDragOver(object recipient, DragOverMessage message)
@@ -825,7 +837,7 @@ internal sealed class MainViewModel : ObservableObject
             }
             catch (AggregateException ex)
             {
-                Log.Logger.Information(ex, "Unable to accept file");                   
+                Log.Logger.Information(ex, "Unable to accept file");
 
                 _dialogService.ShowFileFormatErrorsAsync(ex);
             }
@@ -841,10 +853,19 @@ internal sealed class MainViewModel : ObservableObject
 
     private void HandleDroppedFiles(DragEventArgs dragEventArgs)
     {
+        var jwLibraryFiles = _dragDropService.GetDroppedFiles(dragEventArgs);
+        AddFiles(jwLibraryFiles);
+    }
+
+    private void AddFiles(IEnumerable<string>? jwLibraryFiles)
+    {
+        if (jwLibraryFiles == null)
+        {
+            return;
+        }
+
         var tmpFilesCollection = new ConcurrentBag<JwLibraryFile>();
 
-        var jwLibraryFiles = _dragDropService.GetDroppedFiles(dragEventArgs);
-            
         Parallel.ForEach(jwLibraryFiles, file =>
         {
             var backupFile = _backupFileService.Load(file);
@@ -880,11 +901,11 @@ internal sealed class MainViewModel : ObservableObject
             var file = Files.First();
             return file.MergeParameters.AnyExcludes() ? 1 : 0;
         }
-            
+
         var count = Files.Count(file => file.MergeParameters.AnyIncludes());
         return count == 1 ? 0 : count;
     }
-       
+
     private void GetVersionData()
     {
         if (IsInDesignMode())

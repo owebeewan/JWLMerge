@@ -21,9 +21,9 @@ public class TestMerge : TestBase
             
         mergedDatabase.CheckValidity();
         
-        Assert.AreEqual(numRecords * numFilesToMerge, mergedDatabase.UserMarks.Count);
-        Assert.IsTrue(mergedDatabase.Locations.Count > numRecords);
-        Assert.AreEqual(numRecords * numFilesToMerge, mergedDatabase.Notes.Count);
-        Assert.AreEqual(numRecords * numFilesToMerge, mergedDatabase.BlockRanges.Count);
+        Assert.HasCount(numRecords * numFilesToMerge, mergedDatabase.UserMarks);
+        Assert.IsGreaterThan(numRecords, mergedDatabase.Locations.Count);
+        Assert.HasCount(numRecords * numFilesToMerge, mergedDatabase.Notes);
+        Assert.HasCount(numRecords * numFilesToMerge, mergedDatabase.BlockRanges);
     }
 }

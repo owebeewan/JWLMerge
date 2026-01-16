@@ -83,7 +83,7 @@ internal sealed class NotesExporter
     private static string GetTagsAsCsv(ILookup<int?, TagMap> tags, int noteId, Database database)
     {
         var t = tags[noteId].ToArray();
-        if (!t.Any())
+        if (t.Length == 0)
         {
             return string.Empty;
         }

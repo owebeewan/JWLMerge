@@ -3,7 +3,6 @@ using System.Text;
 
 namespace JWLMerge.BackupFileServices.Helpers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 internal sealed class RedactService
 {
     private readonly Lazy<string[]> _loremIpsumLines;

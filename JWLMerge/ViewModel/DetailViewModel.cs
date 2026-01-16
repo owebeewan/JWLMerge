@@ -9,7 +9,6 @@ using JWLMerge.Models;
 
 namespace JWLMerge.ViewModel;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 internal sealed class DetailViewModel : ObservableObject
 {
     private DataTypeListItem? _selectedDataType;
@@ -77,9 +76,7 @@ internal sealed class DetailViewModel : ObservableObject
         }
     }
 
-#pragma warning disable U2U1200 // Prefer generic collections over non-generic ones
     public IEnumerable? DataItemsSource
-#pragma warning restore U2U1200 // Prefer generic collections over non-generic ones
     {
         get
         {
@@ -118,20 +115,19 @@ internal sealed class DetailViewModel : ObservableObject
 
                     case JwLibraryFileDataTypes.Manifest:
                         return ManifestAsItemsSource(BackupFile?.Manifest);
+
+                    case JwLibraryFileDataTypes.Playlist:
+                        return BackupFile?.Database.PlaylistItems;
                 }
             }
 
-#pragma warning disable S1168 // Empty arrays and collections should be returned instead of null
             return null;
-#pragma warning restore S1168 // Empty arrays and collections should be returned instead of null
         }
     }
 
     public bool IsNotesItemSelected => SelectedDataType?.DataType == JwLibraryFileDataTypes.Note;
 
-#pragma warning disable U2U1011 // Return types should be specific
-    private static IEnumerable ManifestAsItemsSource(Manifest? manifest)
-#pragma warning restore U2U1011 // Return types should be specific
+    private static List<KeyValuePair<string, string>> ManifestAsItemsSource(Manifest? manifest)
     {
         var result = new List<KeyValuePair<string, string>>();
 
@@ -151,9 +147,7 @@ internal sealed class DetailViewModel : ObservableObject
         return result;
     }
 
-    private static List<DataTypeListItem> CreateListItems()
-    {
-        return
+    private static List<DataTypeListItem> CreateListItems() =>
         [
             new("Manifest", JwLibraryFileDataTypes.Manifest),
             new("Block Range", JwLibraryFileDataTypes.BlockRange),
@@ -165,6 +159,6 @@ internal sealed class DetailViewModel : ObservableObject
             new("Tag", JwLibraryFileDataTypes.Tag),
             new("Tag Map", JwLibraryFileDataTypes.TagMap),
             new("User Mark", JwLibraryFileDataTypes.UserMark),
+            new("Playlist", JwLibraryFileDataTypes.Playlist),
         ];
-    }
 }

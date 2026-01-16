@@ -6,10 +6,11 @@ using System.Linq;
 using JWLMerge.Models;
 using JWLMerge.Services;
 using MaterialDesignThemes.Wpf;
+using System.Runtime.Versioning;
 
 namespace JWLMerge.ViewModel;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+[SupportedOSPlatform("windows7.0")]
 internal sealed class RemoveNotesByTagViewModel : ObservableObject
 {
     private bool _removeAssociatedUnderlining;
@@ -76,16 +77,12 @@ internal sealed class RemoveNotesByTagViewModel : ObservableObject
     private void Cancel()
     {
         Result = null;
-#pragma warning disable CA1416
         DialogHost.CloseDialogCommand.Execute(null, null);
-#pragma warning restore CA1416
     }
 
     private void Ok()
     {
         Result = TagItems.Where(x => x.IsChecked).Select(x => x.Id).ToArray();
-#pragma warning disable CA1416
         DialogHost.CloseDialogCommand.Execute(null, null);
-#pragma warning restore CA1416
     }
 }

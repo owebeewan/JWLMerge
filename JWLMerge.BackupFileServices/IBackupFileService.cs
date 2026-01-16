@@ -14,7 +14,7 @@ namespace JWLMerge.BackupFileServices;
 public interface IBackupFileService
 {
     event EventHandler<ProgressEventArgs> ProgressEvent;
-        
+
     /// <summary>
     /// Loads the specified backup file.
     /// </summary>
@@ -119,7 +119,7 @@ public interface IBackupFileService
         BackupFile originalBackupFile,
         IEnumerable<BibleNote> notes,
         string bibleKeySymbol,
-        int mepsLanguageId, 
+        int? mepsLanguageId,
         ImportBibleNotesParams options);
 
     ExportBibleNotesResult ExportBibleNotes(BackupFile backupFile, string bibleNotesExportFilePath, IExportToFileService exportService);
@@ -141,10 +141,12 @@ public interface IBackupFileService
     /// <param name="backup">The backup data.</param>
     /// <param name="newDatabaseFilePath">The new database file path.</param>
     /// <param name="originalJwlibraryFilePathForSchema">The original jwlibrary file path on which to base the new schema.</param>
-    void WriteNewDatabase(
-        BackupFile backup, 
+    /// <param name="sourceFiles">List of the source files for individual media extraction</param>
+    void WriteNewBackup(
+        BackupFile backup,
         string newDatabaseFilePath,
-        string originalJwlibraryFilePathForSchema);
+        string originalJwlibraryFilePathForSchema,
+        IEnumerable<string> sourceFiles);
 
     /// <summary>
     /// Removes all the tags from the specified database.
@@ -180,4 +182,11 @@ public interface IBackupFileService
     /// <param name="database">The database.</param>
     /// <returns>Number of items removed</returns>
     int RemoveUnderlining(Database database);
+
+    /// <summary>
+    /// Removes playlists from the specified database
+    /// </summary>
+    /// <param name="database">The database.</param>
+    /// <returns>Number of items removed</returns>
+    int RemovePlaylists(Database database);
 }

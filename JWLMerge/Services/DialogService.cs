@@ -10,12 +10,11 @@ using MaterialDesignThemes.Wpf;
 using JWLMerge.EventTracking;
 using JWLMerge.Models;
 using JWLMerge.ViewModel;
+using System.Runtime.Versioning;
 
 namespace JWLMerge.Services;
 
-#pragma warning disable CA1416 // Validate platform compatibility
-
-// ReSharper disable once ClassNeverInstantiated.Global
+[SupportedOSPlatform("windows7.0")]
 internal sealed class DialogService : IDialogService
 {
     public const int UntaggedItemId = -1;
@@ -207,5 +206,3 @@ internal sealed class DialogService : IDialogService
         return _isDialogVisible;
     }
 }
-
-#pragma warning restore CA1416 // Validate platform compatibility

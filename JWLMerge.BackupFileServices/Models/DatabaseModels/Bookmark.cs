@@ -50,8 +50,5 @@ public class Bookmark
     /// </summary>
     public int? BlockIdentifier { get; set; }
 
-    public Bookmark Clone()
-    {
-        return (Bookmark)MemberwiseClone();
-    }
+    public Bookmark Clone() => (Bookmark)MemberwiseClone();
 }

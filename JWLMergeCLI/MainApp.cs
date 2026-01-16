@@ -21,10 +21,10 @@ internal sealed class MainApp
     {
         var backupFileService = new BackupFileService();
         backupFileService.ProgressEvent += BackupFileServiceProgress;
-            
+
         var backup = backupFileService.Merge(args.BackupFiles);
-        string outputFileName = string.IsNullOrEmpty(args.OutputFilePath) ? $"{backup.Manifest.Name}.jwlibrary" : args.OutputFilePath;
-        backupFileService.WriteNewDatabase(backup, outputFileName, args.BackupFiles[0]);
+        string outputFileName = args.OutputFilePath ?? $"{backup.Manifest.Name}.jwlibrary";
+        backupFileService.WriteNewBackup(backup, outputFileName, args.BackupFiles[0], args.BackupFiles);
 
         var logMessage = $"{args.BackupFiles.Length} backup files merged to {outputFileName}";
         Log.Logger.Information(logMessage);

@@ -181,7 +181,7 @@
                 Drag and drop .jwlibrary files here or click the browse button
             </TextBlock>
 
-
+            
             <ScrollViewer
                 Grid.Row="0"
                 AllowDrop="True"

@@ -38,8 +38,5 @@ public class BlockRange
     /// </summary>
     public int UserMarkId { get; set; }
 
-    public BlockRange Clone()
-    {
-        return (BlockRange)MemberwiseClone();
-    }
+    public BlockRange Clone() => (BlockRange)MemberwiseClone();
 }

@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using JWLMerge.BackupFileServices.Models;
 using JWLMerge.BackupFileServices.Models.DatabaseModels;
 using MaterialDesignThemes.Wpf;
+using System.Runtime.Versioning;
 
 namespace JWLMerge.ViewModel;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+[SupportedOSPlatform("windows7.0")]
 internal sealed class ImportBibleNotesViewModel : ObservableObject
 {
     private IReadOnlyCollection<Tag>? _tags;
@@ -39,10 +40,8 @@ internal sealed class ImportBibleNotesViewModel : ObservableObject
     private void Cancel()
     {
         Result = null;
-
-#pragma warning disable CA1416
+        
         DialogHost.CloseDialogCommand.Execute(null, null);
-#pragma warning restore CA1416
     }
 
     private void Ok()
@@ -52,8 +51,6 @@ internal sealed class ImportBibleNotesViewModel : ObservableObject
             TagId = SelectedTagId,
         };
 
-#pragma warning disable CA1416
         DialogHost.CloseDialogCommand.Execute(null, null);
-#pragma warning restore CA1416
     }
 }

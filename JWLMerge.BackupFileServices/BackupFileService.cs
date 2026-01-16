@@ -27,9 +27,10 @@ public sealed class BackupFileService : IBackupFileService
     private const int DatabaseVersionSupported = 14;
     private const string ManifestEntryName = "manifest.json";
     private const string DatabaseEntryName = "userData.db";
+    private const string DefaultThumb = "default_thumbnail.png";
 
     private readonly Merger _merger = new();
-        
+
     public BackupFileService()
     {
         _merger.ProgressEvent += MergerProgressEvent;
@@ -44,7 +45,7 @@ public sealed class BackupFileService : IBackupFileService
         {
             throw new ArgumentNullException(nameof(backupFilePath));
         }
-            
+
         if (!File.Exists(backupFilePath))
         {
             throw new BackupFileServicesException($"File does not exist: {backupFilePath}");
@@ -122,9 +123,9 @@ public sealed class BackupFileService : IBackupFileService
 
     /// <inheritdoc />
     public int RemoveNotesByTag(
-        BackupFile backup, 
-        int[]? tagIds, 
-        bool removeUntaggedNotes, 
+        BackupFile backup,
+        int[]? tagIds,
+        bool removeUntaggedNotes,
         bool removeAssociatedUnderlining,
         bool removeAssociatedTags)
     {
@@ -187,7 +188,7 @@ public sealed class BackupFileService : IBackupFileService
         colorIndexes ??= [];
 
         var userMarkIdsToRemove = new HashSet<int>();
-            
+
         foreach (var mark in backup.Database.UserMarks)
         {
             if (colorIndexes.Contains(mark.ColorIndex))
@@ -201,11 +202,11 @@ public sealed class BackupFileService : IBackupFileService
 
     /// <inheritdoc />
     public int RemoveUnderliningByPubAndColor(
-        BackupFile backup, 
-        int colorIndex, 
-        bool anyColor, 
+        BackupFile backup,
+        int colorIndex,
+        bool anyColor,
         string? publicationSymbol,
-        bool anyPublication, 
+        bool anyPublication,
         bool removeAssociatedNotes)
     {
         ArgumentNullException.ThrowIfNull(backup);
@@ -216,7 +217,7 @@ public sealed class BackupFileService : IBackupFileService
         }
 
         var userMarkIdsToRemove = new HashSet<int>();
-            
+
         foreach (var mark in backup.Database.UserMarks)
         {
             if (ShouldRemoveUnderlining(mark, backup.Database, colorIndex, anyColor, publicationSymbol, anyPublication))
@@ -234,14 +235,15 @@ public sealed class BackupFileService : IBackupFileService
         string originalJwlibraryFilePathForSchema)
     {
         Clean(backup);
-        WriteNewDatabase(backup, newDatabaseFilePath, originalJwlibraryFilePathForSchema);
+        WriteNewBackup(backup, newDatabaseFilePath, originalJwlibraryFilePathForSchema, [backup.FilePath]);
     }
 
     /// <inheritdoc />
-    public void WriteNewDatabase(
-        BackupFile backup, 
-        string newDatabaseFilePath, 
-        string originalJwlibraryFilePathForSchema)
+    public void WriteNewBackup(
+        BackupFile backup,
+        string newDatabaseFilePath,
+        string originalJwlibraryFilePathForSchema,
+        IEnumerable<string> sourceFiles)
     {
         ArgumentNullException.ThrowIfNull(backup);
 
@@ -273,7 +275,9 @@ public sealed class BackupFileService : IBackupFileService
                                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                             }));
                 }
-                    
+
+                AddMediaToArchive(archive, sourceFiles, backup.Database.IndependentMedias);
+
                 AddDatabaseEntryToArchive(archive, backup.Database, tmpDatabaseFileName);
             }
             finally
@@ -286,11 +290,11 @@ public sealed class BackupFileService : IBackupFileService
         using var fileStream = new FileStream(newDatabaseFilePath, FileMode.Create);
 
         ProgressMessage("Finishing");
-                    
+
         memoryStream.Seek(0, SeekOrigin.Begin);
         memoryStream.CopyTo(fileStream);
     }
-        
+
     /// <inheritdoc />
     public int RemoveTags(Database database)
     {
@@ -376,6 +380,22 @@ public sealed class BackupFileService : IBackupFileService
     }
 
     /// <inheritdoc />
+    public int RemovePlaylists(Database database)
+    {
+        ArgumentNullException.ThrowIfNull(database);
+
+        var count = database.PlaylistItems.Count;
+        database.PlaylistItemIndependentMediaMaps.Clear();
+        database.PlaylistItemLocationMaps.Clear();
+        database.PlaylistItemMarkerParagraphMaps.Clear();
+        database.PlaylistItemMarkerBibleVerseMaps.Clear();
+        database.PlaylistItemMarkers.Clear();
+        database.PlaylistItems.Clear();
+        database.IndependentMedias.Clear();
+        return count;
+    }
+
+    /// <inheritdoc />
     public BackupFile Merge(IReadOnlyCollection<BackupFile> files)
     {
         ArgumentNullException.ThrowIfNull(files);
@@ -431,7 +451,7 @@ public sealed class BackupFileService : IBackupFileService
         BackupFile originalBackupFile,
         IEnumerable<BibleNote> notes,
         string bibleKeySymbol,
-        int mepsLanguageId, 
+        int? mepsLanguageId,
         ImportBibleNotesParams options)
     {
         ArgumentNullException.ThrowIfNull(originalBackupFile);
@@ -441,8 +461,8 @@ public sealed class BackupFileService : IBackupFileService
 
         var newManifest = UpdateManifest(originalBackupFile.Manifest);
         var notesImporter = new NotesImporter(
-            originalBackupFile.Database, 
-            bibleKeySymbol, 
+            originalBackupFile.Database,
+            bibleKeySymbol,
             mepsLanguageId,
             options);
 
@@ -464,15 +484,9 @@ public sealed class BackupFileService : IBackupFileService
         database.TagMaps.RemoveAll(x => tagIds.Contains(x.TagMapId));
     }
 
-    private static bool SupportDatabaseVersion(int version)
-    {
-        return version == DatabaseVersionSupported;
-    }
+    private static bool SupportDatabaseVersion(int version) => version == DatabaseVersionSupported;
 
-    private static bool SupportManifestVersion(int version)
-    {
-        return version == ManifestVersionSupported;
-    }
+    private static bool SupportManifestVersion(int version) => version == ManifestVersionSupported;
 
     private static string CreateTemporaryDatabaseFile(
         Database backupDatabase,
@@ -765,10 +779,7 @@ public sealed class BackupFileService : IBackupFileService
 
         using var fs = new FileStream(databaseFilePath, FileMode.Open);
         using var bs = new BufferedStream(fs);
-#pragma warning disable SYSLIB0021
-        using var sha1 = new SHA256Managed();
-#pragma warning restore SYSLIB0021
-
+        using var sha1 = SHA256.Create();
         var hash = sha1.ComputeHash(bs);
         var sb = new StringBuilder(2 * hash.Length);
         foreach (var b in hash)
@@ -794,6 +805,48 @@ public sealed class BackupFileService : IBackupFileService
         finally
         {
             File.Delete(tmpDatabaseFile);
+        }
+    }
+
+    private void AddMediaToArchive(ZipArchive archive, IEnumerable<string> sourceFiles, IList<IndependentMedia> independentMedias)
+    {
+        if (!sourceFiles.Any() || !independentMedias.Any())
+        {
+            return;
+        }
+
+        ProgressMessage($"Adding independent media to archive");
+
+        var fileTracker = new List<string>();
+        foreach (var file in sourceFiles)
+        {
+            using var sourceFileStream = File.OpenRead(file);
+            using var sourceArchive = new ZipArchive(sourceFileStream, ZipArchiveMode.Read);
+            foreach (var media in independentMedias)
+            {
+                if (fileTracker.Contains(media.FilePath))
+                {
+                    continue;
+                }
+
+                if (sourceArchive.GetEntry(media.FilePath) is { } entry)
+                {
+                    var targetEntry = archive.CreateEntry(media.FilePath);
+                    using var targetStream = targetEntry.Open();
+                    using var sourceStream = entry.Open();
+                    sourceStream.CopyTo(targetStream);
+                    fileTracker.Add(media.FilePath);
+                }
+
+            }
+            if (!fileTracker.Contains(DefaultThumb) && sourceArchive.GetEntry(DefaultThumb) is { } thumbEntry)
+            {
+                var targetEntry = archive.CreateEntry(DefaultThumb);
+                using var targetStream = targetEntry.Open();
+                using var sourceStream = thumbEntry.Open();
+                sourceStream.CopyTo(targetStream);
+                fileTracker.Add(DefaultThumb);
+            }
         }
     }
 

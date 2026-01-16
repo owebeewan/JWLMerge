@@ -7,7 +7,6 @@ using JWLMerge.ViewModel;
 
 namespace JWLMerge.Services;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 internal sealed class WindowService : IWindowService
 {
     private readonly List<DetailWindow> _detailWindows;

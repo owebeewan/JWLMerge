@@ -12,11 +12,5 @@ internal enum JwLibraryFileDataTypes
     Tag,
     TagMap,
     UserMark,
-    PlaylistItem,
-    PlaylistItemAccuracy,
-    PlaylistItemIndependentMediaMap,
-    PlaylistItemLocationMap,
-    PlaylistItemMarker,
-    PlaylistItemMarkerBibleVerseMap,
-    PlaylistItemMarkerParagraphMap,
+    Playlist,
 }

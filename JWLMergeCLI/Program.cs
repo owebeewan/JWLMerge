@@ -60,7 +60,7 @@ public static class Program
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
-            .WriteTo.File(Path.Combine(folder, "log-{Date}.txt"), retainedFileCountLimit: 28, formatProvider: CultureInfo.InvariantCulture)
+            .WriteTo.File(Path.Combine(folder, $"log-{DateTime.Today:yyyy-MM-dd}.txt"), retainedFileCountLimit: 28, formatProvider: CultureInfo.InvariantCulture)
             .CreateLogger();
 
         Log.Logger.Information("==== Launched ====");

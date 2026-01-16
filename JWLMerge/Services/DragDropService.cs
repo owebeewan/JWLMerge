@@ -5,7 +5,6 @@ using System.Windows;
 
 namespace JWLMerge.Services;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 internal sealed class DragDropService : IDragDropService
 {
     /// <summary>

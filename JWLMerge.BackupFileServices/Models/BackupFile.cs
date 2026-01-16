@@ -9,22 +9,15 @@ namespace JWLMerge.BackupFileServices.Models;
 /// The Backup file.
 /// </summary>
 /// <remarks>We implement INotifyPropertyChanged to prevent the common "WPF binding leak".</remarks>
-public sealed class BackupFile : INotifyPropertyChanged
+public sealed class BackupFile(Manifest manifest, Database database, string filePath) : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public BackupFile(Manifest manifest, Database database, string filePath)
-    {
-        Manifest = manifest;
-        Database = database;
-        FilePath = filePath;
-    }
+    public Manifest Manifest { get; } = manifest;
 
-    public Manifest Manifest { get; }
-        
-    public Database Database { get; }
+    public Database Database { get; } = database;
 
-    public string FilePath { get; }
+    public string FilePath { get; } = filePath;
 
 #pragma warning disable IDE0051 // Remove unused private members
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
