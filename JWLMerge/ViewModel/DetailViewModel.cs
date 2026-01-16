@@ -153,8 +153,8 @@ internal sealed class DetailViewModel : ObservableObject
 
     private static List<DataTypeListItem> CreateListItems()
     {
-        return new()
-        {
+        return
+        [
             new("Manifest", JwLibraryFileDataTypes.Manifest),
             new("Block Range", JwLibraryFileDataTypes.BlockRange),
             new("Bookmark", JwLibraryFileDataTypes.Bookmark),
@@ -165,6 +165,6 @@ internal sealed class DetailViewModel : ObservableObject
             new("Tag", JwLibraryFileDataTypes.Tag),
             new("Tag Map", JwLibraryFileDataTypes.TagMap),
             new("User Mark", JwLibraryFileDataTypes.UserMark),
-        };
+        ];
     }
 }

@@ -3,7 +3,8 @@
     public class PlaylistItemLocationMap
     {
         public int PlaylistItemId { get; set; }
-        public int IndependentMediaId { get; set; }
-        public int DurationTicks { get; set; }
+        public int LocationId { get; set; }
+        public int MajorMultimediaType { get; set; }
+        public int? BaseDurationTicks { get; set; }
     }
 }

@@ -33,22 +33,15 @@ public class Database
     }
 
     public LastModified LastModified { get; } = new();
-
     public List<Location> Locations { get; } = new();
-
     public List<Note> Notes { get; } = new();
-
     public List<InputField> InputFields { get; } = new();
-
     public List<Tag> Tags { get; } = new();
-
     public List<TagMap> TagMaps { get; } = new();
-
     public List<BlockRange> BlockRanges { get; } = new();
-
     public List<Bookmark> Bookmarks { get; } = new();
-
     public List<UserMark> UserMarks { get; } = new();
+    public List<PlaylistItem> PlaylistItems { get; } = new();
     public List<PlaylistItemAccuracy> PlaylistItemAccuracies { get; } = new();
     public List<IndependentMedia> IndependentMedias { get; } = new();
     public List<PlaylistItemIndependentMediaMap> PlaylistItemIndependentMediaMaps { get; } = new();
@@ -75,6 +68,7 @@ public class Database
         Bookmarks.Clear();
         UserMarks.Clear();
         IndependentMedias.Clear();
+        PlaylistItems.Clear();
         PlaylistItemAccuracies.Clear();
         PlaylistItemIndependentMediaMaps.Clear();
         PlaylistItemLocationMaps.Clear();
@@ -111,10 +105,7 @@ public class Database
         Note value,
         TagMap? tagMap)
     {
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
 
         Notes.Add(value);
 
@@ -147,10 +138,7 @@ public class Database
 
     public void AddBlockRangeAndUpdateIndex(BlockRange value)
     {
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
 
         BlockRanges.Add(value);
 
@@ -168,10 +156,7 @@ public class Database
 
     public void AddUserMarkAndUpdateIndex(UserMark value)
     {
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
 
         UserMarks.Add(value);
 
@@ -189,7 +174,7 @@ public class Database
         {
             if (!_userMarksLocationIdIndex.Value.TryGetValue(value.LocationId, out var marks))
             {
-                marks = new List<UserMark>();
+                marks = [];
                 _userMarksLocationIdIndex.Value.Add(value.LocationId, marks);
             }
 
@@ -199,10 +184,7 @@ public class Database
 
     public void AddLocationAndUpdateIndex(Location value)
     {
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
 
         Locations.Add(value);
 

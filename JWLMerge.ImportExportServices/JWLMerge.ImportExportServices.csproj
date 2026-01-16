@@ -13,8 +13,4 @@
 		<Compile Include="..\SolutionInfo.cs" Link="Properties\SolutionInfo.cs" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.1" />
-	</ItemGroup>
-
 </Project>

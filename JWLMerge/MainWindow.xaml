@@ -28,7 +28,7 @@
         <DataTemplate DataType="{x:Type models:JwLibraryFile}">
             <materialDesign:Card
                 Width="220"
-                Height="245"
+                Height="320"
                 Margin="20,20,0,0"
                 Padding="10"
                 IsEnabled="{Binding Path=DataContext.IsNotBusy, ElementName=JwlMergeWindow}">
@@ -90,6 +90,8 @@
                     <CheckBox IsChecked="{Binding MergeParameters.IncludeUnderlining}" Style="{StaticResource MaterialDesignCheckBox}">Underlining</CheckBox>
 
                     <CheckBox IsChecked="{Binding MergeParameters.IncludeTags}" Style="{StaticResource MaterialDesignCheckBox}">Tags</CheckBox>
+
+                    <CheckBox IsChecked="{Binding MergeParameters.IncludePlaylists}" Style="{StaticResource MaterialDesignCheckBox}">Playlists</CheckBox>
 
                     <Separator Margin="0,-4,0,0" Style="{StaticResource MaterialDesignDarkSeparator}" />
 
@@ -176,7 +178,7 @@
                 Margin="10"
                 Style="{StaticResource MaterialDesignBody1TextBlock}"
                 Visibility="{Binding Path=FileListEmpty, Converter={StaticResource BoolToVis}, Mode=OneWay}">
-                Drag and drop .jwlibrary files here
+                Drag and drop .jwlibrary files here or click the browse button
             </TextBlock>
 
 
@@ -202,6 +204,17 @@
                 Mode="PrimaryLight">
                 <DockPanel>
                     <Button
+                        Margin="0,0,10,0"
+                        Command="{Binding BrowseCommand}"
+                        Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
+                        DockPanel.Dock="Left">
+                        <materialDesign:PackIcon
+                                Width="22"
+                                Height="22"
+                                Kind="FileSearch"
+                                ToolTip="Browse for backup file(s)" />
+                    </Button>
+                    <Button
                         Width="110"
                         Margin="0,0,10,0"
                         Command="{Binding MergeCommand}"
@@ -218,7 +231,7 @@
                         Width="110"
                         Margin="0,0,10,0"
                         Command="{Binding UpdateCommand}"
-                        Style="{StaticResource MaterialDesignRaisedAccentButton}"
+                        Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
                         ToolTip="New version available!"
                         Visibility="{Binding Path=IsNewVersionAvailable, Converter={StaticResource BoolToVis}, Mode=OneWay}">
                         UPDATE

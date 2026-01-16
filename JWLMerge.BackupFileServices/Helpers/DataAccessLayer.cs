@@ -88,6 +88,13 @@ internal sealed class DataAccessLayer
             result.UserMarks.AddRange(ReadAllRows(connection, ReadUserMark));
             result.InputFields.AddRange(ReadAllRows(connection, ReadInputField));
             result.IndependentMedias.AddRange(ReadAllRows(connection, ReadIndependentMedia));
+            result.PlaylistItems.AddRange(ReadAllRows(connection, ReadPlaylistItem));
+            result.PlaylistItemAccuracies.AddRange(ReadAllRows(connection, ReadPlaylistItemAccuracy));
+            result.PlaylistItemIndependentMediaMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemIndependentMediaMap));
+            result.PlaylistItemLocationMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemLocationMap));
+            result.PlaylistItemMarkers.AddRange(ReadAllRows(connection, ReadPlaylistItemMarker));
+            result.PlaylistItemMarkerBibleVerseMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemMarkerBibleVerseMap));
+            result.PlaylistItemMarkerParagraphMaps.AddRange(ReadAllRows(connection, ReadPlaylistItemMarkerParagraphMap));
         }
         catch (Exception ex)
         {
@@ -451,7 +458,82 @@ internal sealed class DataAccessLayer
             Hash = ReadString(reader, "Hash"),
         };
     }
+    private PlaylistItem ReadPlaylistItem(SqliteDataReader reader)
+    {
+        return new PlaylistItem
+        {
+            PlaylistItemId = ReadInt(reader, "PlaylistItemId"),
+            Label = ReadString(reader, "Label"),
+            StartTrimOffsetTicks = ReadNullableInt(reader, "StartTrimOffsetTicks"),
+            EndTrimOffsetTicks = ReadNullableInt(reader, "EndTrimOffsetTicks"),
+            Accuracy = ReadInt(reader, "Accuracy"),
+            EndAction = ReadInt(reader, "EndAction"),
+            ThumbnailFilePath = ReadNullableString(reader, "ThumbnailFilePath"),
+        };
+    }
 
+    private PlaylistItemAccuracy ReadPlaylistItemAccuracy(SqliteDataReader reader)
+    {
+        return new PlaylistItemAccuracy
+        {
+            PlaylistItemAccuracyId = ReadInt(reader, "PlaylistItemAccuracyId"),
+            Description = ReadString(reader, "Description"),
+        };
+    }
+
+    private PlaylistItemIndependentMediaMap ReadPlaylistItemIndependentMediaMap(SqliteDataReader reader)
+    {
+        return new PlaylistItemIndependentMediaMap
+        {
+            PlaylistItemId = ReadInt(reader, "PlaylistItemId"),
+            IndependentMediaId = ReadInt(reader, "IndependentMediaId"),
+            DurationTicks = ReadInt(reader, "DurationTicks"),
+        };
+    }
+
+    private PlaylistItemLocationMap ReadPlaylistItemLocationMap(SqliteDataReader reader)
+    {
+        return new PlaylistItemLocationMap
+        {
+            PlaylistItemId = ReadInt(reader, "PlaylistItemId"),
+            LocationId = ReadInt(reader, "LocationId"),
+            MajorMultimediaType = ReadInt(reader, "MajorMultimediaType"),
+            BaseDurationTicks = ReadNullableInt(reader, "BaseDurationTicks"),
+        };
+    }
+
+    private PlaylistItemMarker ReadPlaylistItemMarker(SqliteDataReader reader)
+    {
+        return new PlaylistItemMarker
+        {
+            PlaylistItemMarkerId = ReadInt(reader, "PlaylistItemMarkerId"),
+            PlaylistItemId = ReadInt(reader, "PlaylistItemId"),
+            Label = ReadString(reader, "Label"),
+            StartTimeTicks = ReadInt(reader, "StartTimeTicks"),
+            DurationTicks = ReadInt(reader, "DurationTicks"),
+            EndTransitionDurationTicks = ReadInt(reader, "EndTransitionDurationTicks"),
+        };
+    }
+
+    private PlaylistItemMarkerBibleVerseMap ReadPlaylistItemMarkerBibleVerseMap(SqliteDataReader reader)
+    {
+        return new PlaylistItemMarkerBibleVerseMap
+        {
+            PlaylistItemMarkerId = ReadInt(reader, "PlaylistItemMarkerId"),
+            VerseId = ReadInt(reader, "VerseId"),
+        };
+    }
+
+    private PlaylistItemMarkerParagraphMap ReadPlaylistItemMarkerParagraphMap(SqliteDataReader reader)
+    {
+        return new PlaylistItemMarkerParagraphMap
+        {
+            PlaylistItemMarkerId = ReadInt(reader, "PlaylistItemMarkerId"),
+            MepsDocumentId = ReadInt(reader, "MepsDocumentId"),
+            ParagraphIndex = ReadInt(reader, "ParagraphIndex"),
+            MarkerIndexWithinParagraph = ReadInt(reader, "MarkerIndexWithinParagraph"),
+        };
+    }
     private SqliteConnection CreateConnection()
     {
         return CreateConnection(_databaseFilePath);
