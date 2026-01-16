@@ -8,7 +8,7 @@ namespace JWLMerge.BackupFileServices.Models.DatabaseModels;
 
 public class Database
 {
-    private readonly Dictionary<int, int> _bookmarkSlots = new();
+    private readonly Dictionary<int, int> _bookmarkSlots = [];
         
     private Lazy<Dictionary<Guid, Note>> _notesGuidIndex = null!;
     private Lazy<Dictionary<int, Note>> _notesIdIndex = null!;
@@ -33,22 +33,22 @@ public class Database
     }
 
     public LastModified LastModified { get; } = new();
-    public List<Location> Locations { get; } = new();
-    public List<Note> Notes { get; } = new();
-    public List<InputField> InputFields { get; } = new();
-    public List<Tag> Tags { get; } = new();
-    public List<TagMap> TagMaps { get; } = new();
-    public List<BlockRange> BlockRanges { get; } = new();
-    public List<Bookmark> Bookmarks { get; } = new();
-    public List<UserMark> UserMarks { get; } = new();
-    public List<PlaylistItem> PlaylistItems { get; } = new();
-    public List<PlaylistItemAccuracy> PlaylistItemAccuracies { get; } = new();
-    public List<IndependentMedia> IndependentMedias { get; } = new();
-    public List<PlaylistItemIndependentMediaMap> PlaylistItemIndependentMediaMaps { get; } = new();
-    public List<PlaylistItemLocationMap> PlaylistItemLocationMaps { get; } = new();
-    public List<PlaylistItemMarker> PlaylistItemMarkers { get; } = new();
-    public List<PlaylistItemMarkerBibleVerseMap> PlaylistItemMarkerBibleVerseMaps { get; } = new();
-    public List<PlaylistItemMarkerParagraphMap> PlaylistItemMarkerParagraphMaps { get; } = new();
+    public List<Location> Locations { get; } = [];
+    public List<Note> Notes { get; } = [];
+    public List<InputField> InputFields { get; } = [];
+    public List<Tag> Tags { get; } = [];
+    public List<TagMap> TagMaps { get; } = [];
+    public List<BlockRange> BlockRanges { get; } = [];
+    public List<Bookmark> Bookmarks { get; } = [];
+    public List<UserMark> UserMarks { get; } = [];
+    public List<PlaylistItem> PlaylistItems { get; } = [];
+    public List<PlaylistItemAccuracy> PlaylistItemAccuracies { get; } = [];
+    public List<IndependentMedia> IndependentMedias { get; } = [];
+    public List<PlaylistItemIndependentMediaMap> PlaylistItemIndependentMediaMaps { get; } = [];
+    public List<PlaylistItemLocationMap> PlaylistItemLocationMaps { get; } = [];
+    public List<PlaylistItemMarker> PlaylistItemMarkers { get; } = [];
+    public List<PlaylistItemMarkerBibleVerseMap> PlaylistItemMarkerBibleVerseMaps { get; } = [];
+    public List<PlaylistItemMarkerParagraphMap> PlaylistItemMarkerParagraphMaps { get; } = [];
 
 
     public static string GetDateTimeUtcAsDbString(DateTime dateTime)
@@ -128,7 +128,7 @@ public class Database
         {
             if (!_notesVerseIndex.Value.TryGetValue(verseRef, out var notes))
             {
-                notes = new List<Note>();
+                notes = [];
                 _notesVerseIndex.Value.Add(verseRef, notes);
             }
 
@@ -146,7 +146,7 @@ public class Database
         {
             if (!_blockRangesUserMarkIdIndex.Value.TryGetValue(value.UserMarkId, out var blockRangeList))
             {
-                blockRangeList = new List<BlockRange>();
+                blockRangeList = [];
                 _blockRangesUserMarkIdIndex.Value.Add(value.UserMarkId, blockRangeList);
             }
 
@@ -290,10 +290,7 @@ public class Database
 
     public Location? FindLocationByValues(Location locationValues)
     {
-        if (locationValues == null)
-        {
-            throw new ArgumentNullException(nameof(locationValues));
-        }
+        ArgumentNullException.ThrowIfNull(locationValues);
 
         var key = GetLocationByValueKey(locationValues);
         return _locationsValueIndex.Value.TryGetValue(key, out var location) ? location : null;
@@ -341,7 +338,7 @@ public class Database
         {
             if (!result.TryGetValue(fld.LocationId, out var list))
             {
-                list = new List<InputField>();
+                list = [];
                 result.Add(fld.LocationId, list);
             }
 
@@ -358,7 +355,7 @@ public class Database
 
     private Dictionary<BibleBookChapterAndVerse, List<Note>> NoteVerseIndexValueFactory()
     {
-        Dictionary<BibleBookChapterAndVerse, List<Note>> result = new();
+        Dictionary<BibleBookChapterAndVerse, List<Note>> result = [];
 
         foreach (var note in Notes)
         {
@@ -376,7 +373,7 @@ public class Database
 
                     if (!result.TryGetValue(verseRef, out var notesOnVerse))
                     {
-                        notesOnVerse = new List<Note>();
+                        notesOnVerse = [];
                         result.Add(verseRef, notesOnVerse);
                     }
 
@@ -406,7 +403,7 @@ public class Database
         {
             if (!result.TryGetValue(userMark.LocationId, out var marks))
             {
-                marks = new List<UserMark>();
+                marks = [];
                 result.Add(userMark.LocationId, marks);
             }
 
@@ -462,7 +459,7 @@ public class Database
         {
             if (!result.TryGetValue(range.UserMarkId, out var blockRangeList))
             {
-                blockRangeList = new List<BlockRange>();
+                blockRangeList = [];
                 result.Add(range.UserMarkId, blockRangeList);
             }
 
@@ -594,17 +591,13 @@ public class Database
 
             var key = $"{loc.KeySymbol}|{loc.IssueTagNumber}|{loc.MepsLanguage}|{loc.DocumentId.Value}|{loc.Track.Value}|{loc.Type}";
 
-            if (keys.Contains(key))
+            if (!keys.Add(key))
             {
                 // found a duplicate that will cause a constraint exception.
                 ++fixupCount;
                 Locations.RemoveAt(n);
 
                 Log.Logger.Error($"Removed duplicate location {loc.LocationId}");
-            }
-            else
-            {
-                keys.Add(key);
             }
         }
 

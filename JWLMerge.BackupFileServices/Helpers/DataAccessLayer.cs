@@ -12,14 +12,9 @@ namespace JWLMerge.BackupFileServices.Helpers;
 /// Isolates all data access to the SQLite database embedded in
 /// jwlibrary files.
 /// </summary>
-internal sealed class DataAccessLayer
+internal sealed class DataAccessLayer(string databaseFilePath)
 {
-    private readonly string _databaseFilePath;
-
-    public DataAccessLayer(string databaseFilePath)
-    {
-        _databaseFilePath = databaseFilePath;
-    }
+    private readonly string _databaseFilePath = databaseFilePath;
 
     /// <summary>
     /// Creates a new empty database using the schema from the current database.
@@ -52,6 +47,13 @@ internal sealed class DataAccessLayer
         PopulateTable(connection, dataToUse.InputFields);
         PopulateTable(connection, dataToUse.Bookmarks);
         PopulateTable(connection, dataToUse.BlockRanges);
+        PopulateTable(connection, dataToUse.PlaylistItems);
+        PopulateTable(connection, dataToUse.PlaylistItemAccuracies);
+        PopulateTable(connection, dataToUse.PlaylistItemIndependentMediaMaps);
+        PopulateTable(connection, dataToUse.PlaylistItemLocationMaps);
+        PopulateTable(connection, dataToUse.PlaylistItemMarkers);
+        PopulateTable(connection, dataToUse.PlaylistItemMarkerBibleVerseMaps);
+        PopulateTable(connection, dataToUse.PlaylistItemMarkerParagraphMaps);
     }
 
     /// <summary>
@@ -108,7 +110,7 @@ internal sealed class DataAccessLayer
         return result;
     }
 
-    private void LogTables(List<string> tables)
+    private static void LogTables(List<string> tables)
     {
         foreach (string table in tables)
         {
@@ -239,7 +241,14 @@ internal sealed class DataAccessLayer
         ClearTable(connection, "Tag");
         ClearTable(connection, "UserMark");
         ClearTable(connection, "Location");
-            
+        ClearTable(connection, "PlaylistItems");
+        ClearTable(connection, "PlaylistItemAccuracies");
+        ClearTable(connection, "PlaylistItemIndependentMediaMaps");
+        ClearTable(connection, "PlaylistItemLocationMaps");
+        ClearTable(connection, "PlaylistItemMarkers");
+        ClearTable(connection, "PlaylistItemMarkerBibleVerseMaps");
+        ClearTable(connection, "PlaylistItemMarkerParagraphMaps");
+
         UpdateLastModified(connection);
 
         VacuumDatabase(connection);
