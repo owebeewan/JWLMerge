@@ -1,8 +1,8 @@
 # JWLMerge <img src="https://ci.appveyor.com/api/projects/status/2nl90i7apndaxcac?svg=true">
 
-## NOW ARCHIVED
+## FORKED VERSION
 
-Note that this project is no longer compatible with the latest version of the JW Library. In July 2023 the database schema was changed from v8 to v13 and I will not be updating JWLMerge to support the new version. In Jan 2023, the JW Library licence agreement was strengthened, but it also gave opportunity for 3rd party developers to apply for official permission to do the sort of work that is present in JWLMerge. I made an application in January but have not received permission, and in these circumstances feel it best to archive the project at this juncture. Thank you for your understanding, and for your valuable input and feedback on the project over the last 6 years.
+This is a fork of the original [JWLMerge project](https://github.com/AntonyCorbett/JWLMerge) which is now purged or inaccessible. I've continued updating and maintaining the project to keep it working with the latest JW Library backup file format. I've also added some new features and improvements based on my own usage.
 
 ### Introduction
 
@@ -16,11 +16,11 @@ At time of writing, JW Library has _backup_ and _restore_ commands, but no _merg
 
 Download the JWLMergeSetup.exe file from the latest release and run it. There is also a "portable" version (so you can just copy files to a folder).
 
-https://github.com/AntonyCorbett/JWLMerge/releases/latest
+https://github.com/DavidIQ/JWLMerge/releases/latest
 
 **Please see the wiki for further information:**
 
-https://github.com/AntonyCorbett/JWLMerge/wiki
+https://github.com/SuperJC710e/JWLMerge/wiki
 
 #### Command-line
 

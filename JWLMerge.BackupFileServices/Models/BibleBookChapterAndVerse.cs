@@ -2,30 +2,17 @@
 
 namespace JWLMerge.BackupFileServices.Models;
 
-public readonly struct BibleBookChapterAndVerse : IEquatable<BibleBookChapterAndVerse>
+public readonly struct BibleBookChapterAndVerse(int bookNum, int chapterNum, int verseNum) : IEquatable<BibleBookChapterAndVerse>
 {
-    public BibleBookChapterAndVerse(int bookNum, int chapterNum, int verseNum)
-    {
-        BookNumber = bookNum;
-        ChapterNumber = chapterNum;
-        VerseNumber = verseNum;
-    }
+    public int BookNumber { get; } = bookNum;
 
-    public int BookNumber { get; }
+    public int ChapterNumber { get; } = chapterNum;
 
-    public int ChapterNumber { get; }
+    public int VerseNumber { get; } = verseNum;
 
-    public int VerseNumber { get; }
+    public static bool operator ==(BibleBookChapterAndVerse lhs, BibleBookChapterAndVerse rhs) => lhs.Equals(rhs);
 
-    public static bool operator ==(BibleBookChapterAndVerse lhs, BibleBookChapterAndVerse rhs)
-    {
-        return lhs.Equals(rhs);
-    }
-
-    public static bool operator !=(BibleBookChapterAndVerse lhs, BibleBookChapterAndVerse rhs)
-    {
-        return !lhs.Equals(rhs);
-    }
+    public static bool operator !=(BibleBookChapterAndVerse lhs, BibleBookChapterAndVerse rhs) => !lhs.Equals(rhs);
 
     public override int GetHashCode()
     {
@@ -37,14 +24,9 @@ public readonly struct BibleBookChapterAndVerse : IEquatable<BibleBookChapterAnd
             return hashCode;
         }
     }
-        
-    public override bool Equals(object? obj)
-    {
-        return obj is BibleBookChapterAndVerse other && Equals(other);
-    }
+
+    public override bool Equals(object? obj) => obj is BibleBookChapterAndVerse other && Equals(other);
 
     public bool Equals(BibleBookChapterAndVerse other)
-    {
-        return BookNumber == other.BookNumber && ChapterNumber == other.ChapterNumber && VerseNumber == other.VerseNumber;
-    }
+        => BookNumber == other.BookNumber && ChapterNumber == other.ChapterNumber && VerseNumber == other.VerseNumber;
 }

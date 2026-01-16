@@ -13,9 +13,10 @@ public interface ISnackbarService
         object content,
         object actionContent,
         Action<object?> actionHandler,
-        object actionArgument,
+        object? actionArgument,
         bool promote,
-        bool neverConsiderToBeDuplicate);
+        bool neverConsiderToBeDuplicate,
+        TimeSpan? durationOverride = null);
 
     void Enqueue(object content);
 

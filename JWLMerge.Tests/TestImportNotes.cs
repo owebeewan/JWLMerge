@@ -42,7 +42,7 @@ in the note.";
         var file = new BibleNotesFile(lines.Split(Environment.NewLine));
 
         var sections = file.GetPubSymbolsAndLanguages();
-        Assert.AreEqual(2, sections.Length);
+        Assert.HasCount(2, sections);
         
         Assert.AreEqual("nwtsty", sections[0].PubSymbol);
         Assert.AreEqual(0, sections[0].LanguageId);
@@ -51,7 +51,7 @@ in the note.";
         Assert.AreEqual(1, sections[1].LanguageId);
 
         var notes = file.GetNotes(new PubSymbolAndLanguage("nwtsty", 0)).ToArray();
-        Assert.AreEqual(2, notes.Length);
+        Assert.HasCount(2, notes);
 
         Assert.AreEqual(new BibleBookChapterAndVerse(1, 3, 15), notes[0].BookChapterAndVerse);
         Assert.AreEqual("A note", notes[0].NoteTitle);
@@ -65,7 +65,7 @@ in the note.";
         Assert.AreEqual("Another paragraph\r\nin the note.", notes[1].NoteContent);
 
         notes = file.GetNotes(new PubSymbolAndLanguage("nwtstyAnother", 1)).ToArray();
-        Assert.AreEqual(2, notes.Length);
+        Assert.HasCount(2, notes);
 
         Assert.AreEqual(new BibleBookChapterAndVerse(1, 3, 15), notes[0].BookChapterAndVerse);
     }
@@ -92,20 +92,18 @@ in the note.";
         file1.Database.CheckValidity();
 
         Assert.AreEqual(notes.Length, result.BibleNotesAdded);
-        Assert.IsTrue(result.BibleNotesUnchanged == 0);
-        Assert.IsTrue(result.BibleNotesUpdated == 0);
+        Assert.AreEqual(0, result.BibleNotesUnchanged);
+        Assert.AreEqual(0, result.BibleNotesUpdated);
 
         result = importer.Import(notes);
 
         Assert.AreEqual(notes.Length, result.BibleNotesUnchanged);
-        Assert.IsTrue(result.BibleNotesAdded == 0);
-        Assert.IsTrue(result.BibleNotesUpdated == 0);
+        Assert.AreEqual(0, result.BibleNotesAdded);
+        Assert.AreEqual(0, result.BibleNotesUpdated);
     }
 
-    private static IEnumerable<BibleNote> CreateMockBibleNotes()
-    {
-        return new List<BibleNote>
-        {
+    private static List<BibleNote> CreateMockBibleNotes() =>
+    [
             new()
             {
                 BookChapterAndVerse = new BibleBookChapterAndVerse(1, 1, 1),
@@ -118,6 +116,5 @@ in the note.";
                 NoteTitle = "A note 2",
                 NoteContent = "My notes go here",
             },
-        };
-    }
+        ];
 }

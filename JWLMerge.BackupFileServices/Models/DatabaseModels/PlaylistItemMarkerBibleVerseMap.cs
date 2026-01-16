@@ -1,10 +1,16 @@
-﻿using JWLMerge.BackupFileServices.Models.DatabaseModels;
+﻿namespace JWLMerge.BackupFileServices.Models.DatabaseModels;
 
-namespace JWLMerge.BackupFileServices.Models.DatabaseModels
+public class PlaylistItemMarkerBibleVerseMap
 {
-    public class PlaylistItemMarkerBibleVerseMap
-    {
-        public int PlaylistItemMarkerId { get; set; }
-        public int VerseId { get; set; }
-    }
+    /// <summary>
+    /// The playlist item marker identifier.
+    /// </summary>
+    public int PlaylistItemMarkerId { get; set; }
+
+    /// <summary>
+    /// The verse identifier.
+    /// </summary>
+    public int VerseId { get; set; }
+
+    public PlaylistItemMarkerBibleVerseMap Clone() => (PlaylistItemMarkerBibleVerseMap)MemberwiseClone();
 }

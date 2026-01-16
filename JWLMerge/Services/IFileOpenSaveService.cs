@@ -11,4 +11,6 @@ internal interface IFileOpenSaveService
     string? GetBibleNotesExportFilePath(string title);
 
     ImportExportFileType GetFileType(string? fileName);
+
+    string[]? GetOpenFiles(string title);
 }

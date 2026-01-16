@@ -9,6 +9,7 @@ public class MergeParameters : ObservableObject
     private bool _includeUnderlining;
     private bool _includeTags;
     private bool _includeInputFields;
+    private bool _includePlaylists;
 
     public MergeParameters()
     {
@@ -17,6 +18,7 @@ public class MergeParameters : ObservableObject
         IncludeUnderlining = true;
         IncludeTags = true;
         IncludeInputFields = true;
+        IncludePlaylists = true;
     }
 
     public bool IncludeInputFields
@@ -84,13 +86,26 @@ public class MergeParameters : ObservableObject
         }
     }
 
+    public bool IncludePlaylists
+    {
+        get => _includePlaylists;
+        set
+        {
+            if (_includePlaylists != value)
+            {
+                _includePlaylists = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public bool AnyIncludes()
     {
-        return IncludeTags || IncludeBookmarks || IncludeNotes || IncludeUnderlining || IncludeInputFields;
+        return IncludeTags || IncludeBookmarks || IncludeNotes || IncludeUnderlining || IncludeInputFields || IncludePlaylists;
     }
 
     public bool AnyExcludes()
     {
-        return !IncludeTags || !IncludeBookmarks || !IncludeNotes || !IncludeUnderlining || !IncludeInputFields;
+        return !IncludeTags || !IncludeBookmarks || !IncludeNotes || !IncludeUnderlining || !IncludeInputFields || !IncludePlaylists;
     }
 }

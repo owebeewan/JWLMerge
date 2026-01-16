@@ -24,7 +24,7 @@ public class TextFileService : IExportToFileService
             throw new ArgumentNullException(nameof(exportFilePath));
         }
 
-        if (notes == null || !notes.Any())
+        if (notes == null || notes.Count == 0)
         {
             result.NoNotesFound = true;
             return result;

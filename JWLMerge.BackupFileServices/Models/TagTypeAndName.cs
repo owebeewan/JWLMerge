@@ -1,34 +1,21 @@
 ﻿namespace JWLMerge.BackupFileServices.Models;
 
-internal sealed class TagTypeAndName
+internal sealed class TagTypeAndName(int type, string name)
 {
-    public TagTypeAndName(int type, string name)
-    {
-        TagType = type;
-        Name = name;
-    }
+    public int TagType { get; } = type;
 
-    public int TagType { get; }
+    public string Name { get; } = name;
 
-    public string Name { get; }
-
-    public override int GetHashCode()
-    {
-        return new { TagType, Name }.GetHashCode();
-    }
+    public override int GetHashCode() => new { TagType, Name }.GetHashCode();
 
     public override bool Equals(object? obj)
     {
-        switch (obj)
+        return obj switch
         {
-            case null:
-                return false;
-
-            case TagTypeAndName o:
-                return TagType == o.TagType && 
-                       Name == o.Name;
-            default:
-                return false;
-        }
+            null => false,
+            TagTypeAndName o => TagType == o.TagType &&
+                                   Name == o.Name,
+            _ => false,
+        };
     }
 }

@@ -1,12 +1,16 @@
 Version 14 followed on from Version 13. Changes (as they affect JWLMerge) are as follows:
 
+"Location" Table
+Modified MepsLanguage NULL (formerly NOT NULL) and associated Check Constraint
 Removing triggers to not update last modified date on InputField updates 
 Removing triggers to not update last modified date on IndependentMedia deletes 
 
+"Tag" Table
+Removed ImageFilename column
 
 Added Triggers for all tables to update the LastModifiedDate
 
-New tables (Ignored for JWL Merge)
+New tables
 ___________
 PlaylistItemAccuracy
 IndependentMedia
@@ -61,7 +65,7 @@ CREATE TABLE TagMap (
                     (NoteId IS NULL AND LocationId IS NULL AND PlaylistItemId IS NOT NULL) OR 
                     (LocationId IS NULL AND PlaylistItemId IS NULL AND NoteId IS NOT NULL) OR 
                     (PlaylistItemId IS NULL AND NoteId IS NULL AND LocationId IS NOT NULL))
-            );
+);
 
 CREATE TABLE IF NOT EXISTS "Note"(
                 NoteId          INTEGER NOT NULL PRIMARY KEY,
@@ -102,7 +106,7 @@ CREATE TABLE BlockRange (
                 CHECK (BlockType BETWEEN 1 AND 2),
                 FOREIGN KEY(UserMarkId) REFERENCES UserMark(UserMarkId)
             );
-			
+
 CREATE TABLE "LastModified"(LastModified TEXT NOT NULL)
 
 CREATE TABLE "PlaylistItem"(
@@ -119,12 +123,12 @@ CHECK(length(Label) > 0),
 CHECK(EndAction IN(0, 1, 2, 3)));
 
 CREATE TABLE "InputField"(						  
-				LocationId  INTEGER NOT NULL,
-				TextTag     TEXT NOT NULL,
-				Value       TEXT NOT NULL,
-				FOREIGN KEY (LocationId) REFERENCES Location (LocationId),
+                LocationId  INTEGER NOT NULL,
+                TextTag     TEXT NOT NULL,
+                Value       TEXT NOT NULL,
+                FOREIGN KEY (LocationId) REFERENCES Location (LocationId),
 				CONSTRAINT LocationId_TextTag PRIMARY KEY (LocationId, TextTag));
-				
+
 CREATE TABLE "Location"(
 	LocationId      INTEGER NOT NULL PRIMARY KEY,
 	BookNumber      INTEGER,
@@ -135,7 +139,7 @@ CREATE TABLE "Location"(
 	KeySymbol       TEXT,
 	MepsLanguage    INTEGER,
 	Type            INTEGER NOT NULL,
-	Title           TEXT,
+                Title           TEXT,
 	UNIQUE(BookNumber, ChapterNumber, KeySymbol, MepsLanguage, Type),
 	UNIQUE(KeySymbol, IssueTagNumber, MepsLanguage, DocumentId, Track, Type),
 CHECK ((
@@ -171,15 +175,15 @@ OR Type NOT IN (2, 3)));
 CREATE TABLE PlaylistItemAccuracy(
 	PlaylistItemAccuracyId  INTEGER NOT NULL PRIMARY KEY,
 	Description             TEXT NOT NULL UNIQUE);
-	CREATE TABLE IndependentMedia(
-	IndependentMediaId  INTEGER NOT NULL PRIMARY KEY,
-	OriginalFilename    TEXT NOT NULL,
-	FilePath            TEXT NOT NULL UNIQUE,
-	MimeType            TEXT NOT NULL,
-	Hash                TEXT NOT NULL,
-CHECK(length(OriginalFilename) > 0),
-CHECK(length(FilePath) > 0),
-CHECK(length(MimeType) > 0),
+CREATE TABLE IndependentMedia(
+	            IndependentMediaId  INTEGER NOT NULL PRIMARY KEY,
+	            OriginalFilename    TEXT NOT NULL,
+	            FilePath            TEXT NOT NULL UNIQUE,
+	            MimeType            TEXT NOT NULL,  
+	            Hash                TEXT NOT NULL,
+	            CHECK(length(OriginalFilename) > 0),
+	            CHECK(length(FilePath) > 0),
+	            CHECK(length(MimeType) > 0),
 CHECK(length(Hash) > 0));
 CREATE TABLE PlaylistItemIndependentMediaMap(
 	PlaylistItemId      INTEGER NOT NULL,
@@ -195,7 +199,7 @@ CREATE TABLE PlaylistItemLocationMap(
 	MajorMultimediaType INTEGER NOT NULL,
 	BaseDurationTicks   INTEGER,
 PRIMARY KEY(PlaylistItemId, LocationId),
-FOREIGN KEY(PlaylistItemId) REFERENCES PlaylistItem(PlaylistItemId),
+                FOREIGN KEY(PlaylistItemId) REFERENCES PlaylistItem(PlaylistItemId),
 FOREIGN KEY(LocationId) REFERENCES Location(LocationId))
 WITHOUT ROWID;
 CREATE TABLE PlaylistItemMarker(
@@ -222,6 +226,12 @@ PRIMARY KEY(PlaylistItemMarkerId, MepsDocumentId, ParagraphIndex, MarkerIndexWit
 FOREIGN KEY(PlaylistItemMarkerId) REFERENCES PlaylistItemMarker(PlaylistItemMarkerId))
 WITHOUT ROWID;
 
+CREATE VIEW PlaylistView AS 
+              SELECT t.Name, t.ImageFilename, Count(tm.TagId) AS ItemCount 
+              FROM Tag t LEFT JOIN TagMap tm ON tm.TagId=t.TagId 
+              WHERE t.Type=2 
+              GROUP BY t.TagId 
+              ORDER BY t.Name COLLATE NOCASE;
 
 CREATE INDEX IX_BlockRange_UserMarkId ON BlockRange(UserMarkId);
 CREATE INDEX IX_TagMap_TagId ON TagMap(TagId);
@@ -229,10 +239,13 @@ CREATE INDEX IX_TagMap_PlaylistItemId_TagId_Position ON TagMap(PlaylistItemId, T
 CREATE INDEX IX_TagMap_LocationId_TagId_Position ON TagMap(LocationId, TagId, Position);
 CREATE INDEX IX_TagMap_NoteId_TagId_Position ON TagMap(NoteId, TagId, Position);
 CREATE INDEX IX_UserMark_LocationId ON UserMark(LocationId);
-CREATE INDEX IX_Location_KeySymbol_MepsLanguage_BookNumber_ChapterNumber ON
-				Location(KeySymbol, MepsLanguage, BookNumber, ChapterNumber);
+CREATE INDEX IX_Location_KeySymbol_MepsLanguage_BookNumber_ChapterNumber ON 
+                Location(KeySymbol, MepsLanguage, BookNumber, ChapterNumber);
+
 CREATE INDEX IX_Location_MepsLanguage_DocumentId ON Location(MepsLanguage, DocumentId);
+
 CREATE INDEX IX_Note_LastModified_LocationId ON Note(LastModified, LocationId);
+
 CREATE INDEX IX_Note_LocationId_BlockIdentifier ON Note(LocationId, BlockIdentifier);
 CREATE INDEX IX_PlaylistItemIndependentMediaMap_IndependentMediaId ON PlaylistItemIndependentMediaMap(IndependentMediaId);
 CREATE INDEX IX_PlaylistItemLocationMap_LocationId ON PlaylistItemLocationMap(LocationId);

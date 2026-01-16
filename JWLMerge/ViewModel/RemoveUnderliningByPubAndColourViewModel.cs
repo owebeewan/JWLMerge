@@ -3,9 +3,11 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using JWLMerge.Models;
 using MaterialDesignThemes.Wpf;
+using System.Runtime.Versioning;
 
 namespace JWLMerge.ViewModel;
 
+[SupportedOSPlatform("windows7.0")]
 internal sealed class RemoveUnderliningByPubAndColourViewModel : ObservableObject
 {
     private bool _removeAssociatedNotes;
@@ -67,9 +69,7 @@ internal sealed class RemoveUnderliningByPubAndColourViewModel : ObservableObjec
     private void Cancel()
     {
         Result = null;
-#pragma warning disable CA1416
         DialogHost.CloseDialogCommand.Execute(null, null);
-#pragma warning restore CA1416
     }
 
     private void Ok()
@@ -83,8 +83,6 @@ internal sealed class RemoveUnderliningByPubAndColourViewModel : ObservableObjec
             RemoveAssociatedNotes = RemoveAssociatedNotes,
         };
 
-#pragma warning disable CA1416
         DialogHost.CloseDialogCommand.Execute(null, null);
-#pragma warning restore CA1416
     }
 }

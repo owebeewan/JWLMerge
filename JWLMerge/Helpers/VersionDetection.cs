@@ -14,10 +14,7 @@ internal static class VersionDetection
 
         try
         {
-#pragma warning disable U2U1025 // Avoid instantiating HttpClient
             using var client = new HttpClient();
-#pragma warning restore U2U1025 // Avoid instantiating HttpClient
-
             var response = client.GetAsync(new Uri(latestReleaseUrl)).Result;
             if (response.IsSuccessStatusCode)
             {
@@ -25,9 +22,9 @@ internal static class VersionDetection
                 if (latestVersionUri != null)
                 {
                     var segments = latestVersionUri.Segments;
-                    if (segments.Any())
+                    if (segments.Length != 0)
                     {
-                        version = segments[^1];
+                        version = segments[^1].Replace("v", "");
                     }
                 }
             }
@@ -43,8 +40,8 @@ internal static class VersionDetection
     public static Version GetCurrentVersion()
     {
         var ver = Assembly.GetExecutingAssembly().GetName().Version;
-        return ver != null 
-            ? new Version($"{ver.Major}.{ver.Minor}.{ver.Build}.{ver.Revision}") 
+        return ver != null
+            ? new Version($"{ver.Major}.{ver.Minor}.{ver.Build}.{ver.Revision}")
             : new Version();
     }
 }

@@ -33,7 +33,8 @@ internal sealed class JwLibraryFile : ObservableObject
             sb.AppendLine(CultureInfo.InvariantCulture, $"{BackupFile.Database.Bookmarks.Count} bookmarks");
             sb.AppendLine(CultureInfo.InvariantCulture, $"{BackupFile.Database.InputFields.Count} input fields");
             sb.AppendLine(CultureInfo.InvariantCulture, $"{BackupFile.Database.UserMarks.Count} underlining");
-            sb.Append(CultureInfo.InvariantCulture, $"{BackupFile.Database.Tags.Count} tags");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"{BackupFile.Database.Tags.Count} tags");
+            sb.Append(CultureInfo.InvariantCulture, $"{BackupFile.Database.PlaylistItems.Count} playlists");
 
             return sb.ToString();
         }

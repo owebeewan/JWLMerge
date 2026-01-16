@@ -118,9 +118,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="HOMEPAGE" xml:space="preserve">
-    <value>https://github.com/AntonyCorbett/JWLMerge</value>
+    <value>https://github.com/DavidIQ/JWLMerge</value>
   </data>
   <data name="LATEST_RELEASE_URL" xml:space="preserve">
-    <value>https://github.com/AntonyCorbett/JWLMerge/releases/latest</value>
+    <value>https://github.com/DavidIQ/JWLMerge/releases/latest</value>
   </data>
 </root>

@@ -41,6 +41,11 @@ internal static class MergePreparation
             changeCount += backupFileService.RemoveInputFields(database);
         }
 
+        if (!fileMergeParameters.IncludePlaylists)
+        {
+            changeCount += backupFileService.RemovePlaylists(database);
+        }
+
         return changeCount;
     }
 }

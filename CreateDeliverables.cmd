@@ -4,8 +4,19 @@ REM Run from dev command line
 
 VERIFY ON
 
-D:
-cd \ProjectsPersonal\JWLMerge
+REM To override copy the next 3 lines into a file called CreateDeliverables.user and change values as required.
+SET "CODE_DRIVE=D:"
+SET "CODE_DIRECTORY=\ProjectsPersonal\JWLMerge"
+SET "INNO_SETUP_PATH=D:\Program Files (x86)\Inno Setup 6"
+
+IF EXIST CreateDeliverables.user (
+    FOR /f "tokens=* delims=" %%x IN (CreateDeliverables.user) DO (
+        %%x
+    )
+)
+
+%CODE_DRIVE%
+cd %CODE_DIRECTORY%
 rd JWLMerge\bin /q /s
 rd JWLMergeCLI\bin /q /s
 rd Installer\Output /q /s
@@ -25,14 +36,14 @@ md Installer\Staging
 
 ECHO.
 ECHO Copying JWLMergeCLI items into staging area
-xcopy JWLMergeCLI\bin\Release\net6.0\publish\*.* Installer\Staging /q /s /y /d
+xcopy JWLMergeCLI\bin\Release\net9.0\publish\*.* Installer\Staging /q /s /y /d
 
 ECHO Copying JWLMerge items into staging area
-xcopy JWLMerge\bin\Release\net6.0-windows\publish\*.* Installer\Staging /q /s /y /d
+xcopy JWLMerge\bin\Release\net9.0-windows\publish\*.* Installer\Staging /q /s /y /d
 
 ECHO.
 ECHO Creating installer
-"D:\Program Files (x86)\Inno Setup 6\iscc" Installer\jwlmergesetup.iss
+"%INNO_SETUP_PATH%\iscc" Installer\jwlmergesetup.iss
 IF %ERRORLEVEL% NEQ 0 goto ERROR
 
 ECHO.

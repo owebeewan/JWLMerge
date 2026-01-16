@@ -36,15 +36,10 @@ public sealed class Manifest : INotifyPropertyChanged
     /// </summary>
     public UserDataBackup UserDataBackup { get; set; } = null!;
 
-    public Manifest Clone()
-    {
-        return (Manifest)MemberwiseClone();
-    }
+    public Manifest Clone() => (Manifest)MemberwiseClone();
 
 #pragma warning disable IDE0051 // Remove unused private members        
-#pragma warning disable S1144 // Remove unused private members
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-#pragma warning restore S1144 // Remove unused private members
 #pragma warning restore IDE0051 // Remove unused private members
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
