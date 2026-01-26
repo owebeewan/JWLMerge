@@ -83,7 +83,7 @@ public sealed class BackupFileService : IBackupFileService
     /// <inheritdoc />
     public void RemoveFavourites(BackupFile backup)
     {
-        ArgumentNullException.ThrowIfNull(backup);
+        ArgumentNullException.ThrowIfNull(backup, nameof(backup));
 
         backup.Database.TagMaps.RemoveAll(x => x.TagId == 1);
     }

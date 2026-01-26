@@ -14,20 +14,6 @@ public class WrongDatabaseVersionException : BackupFileServicesException
         FoundVersion = foundVersion;
     }
 
-    public WrongDatabaseVersionException()
-    {
-    }
-
-    public WrongDatabaseVersionException(string errorMessage)
-        : base(errorMessage)
-    {
-    }
-
-    public WrongDatabaseVersionException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
-
     // Without this constructor, deserialization will fail
     protected WrongDatabaseVersionException(SerializationInfo info, StreamingContext context)
         : base(info, context)
