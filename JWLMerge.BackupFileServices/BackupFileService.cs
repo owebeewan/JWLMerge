@@ -308,9 +308,9 @@ public sealed class BackupFileService : IBackupFileService
         }
 
         database.TagMaps.Clear();
-            
-        return tagCount > 1 
-            ? tagCount - 1 
+
+        return tagCount > 1
+            ? tagCount - 1
             : tagCount;
     }
 
@@ -441,7 +441,7 @@ public sealed class BackupFileService : IBackupFileService
         // just pick the first manifest as the basis for the 
         // manifest in the final merged file...
         var newManifest = UpdateManifest(originals[0].Manifest);
-            
+
         var mergedDatabase = MergeDatabases(originals);
         return new BackupFile(newManifest, mergedDatabase, "unknown.jwlibrary");
     }
@@ -640,8 +640,8 @@ public sealed class BackupFileService : IBackupFileService
     private Database ReadDatabase(ZipArchive archive, string databaseName)
     {
         ProgressMessage($"Reading database {databaseName}");
-            
-        var databaseEntry = archive.Entries.FirstOrDefault(x => x.Name.Equals(databaseName, StringComparison.OrdinalIgnoreCase)) 
+
+        var databaseEntry = archive.Entries.FirstOrDefault(x => x.Name.Equals(databaseName, StringComparison.OrdinalIgnoreCase))
                             ?? throw new BackupFileServicesException("Could not find database entry in jwlibrary file");
 
         Database result;
@@ -685,17 +685,17 @@ public sealed class BackupFileService : IBackupFileService
     private Manifest ReadManifest(string filename, ZipArchive archive)
     {
         ProgressMessage("Reading manifest");
-            
+
         var manifestEntry = archive.Entries.FirstOrDefault(x => x.Name.Equals(ManifestEntryName, StringComparison.OrdinalIgnoreCase))
             ?? throw new BackupFileServicesException($"Could not find manifest entry in jwlibrary file: {filename}");
-        
+
         using var stream = new StreamReader(manifestEntry.Open());
 
         var fileContents = stream.ReadToEnd();
 
         Log.Logger.Debug("Parsing manifest");
         dynamic data = JObject.Parse(fileContents);
-                
+
         int manifestVersion = data.version ?? 0;
         if (!SupportManifestVersion(manifestVersion))
         {
@@ -791,12 +791,12 @@ public sealed class BackupFileService : IBackupFileService
     }
 
     private void AddDatabaseEntryToArchive(
-        ZipArchive archive, 
-        Database database, 
+        ZipArchive archive,
+        Database database,
         string originalDatabaseFilePathForSchema)
     {
         ProgressMessage("Adding database to archive");
-            
+
         var tmpDatabaseFile = CreateTemporaryDatabaseFile(database, originalDatabaseFilePathForSchema);
         try
         {
@@ -859,7 +859,7 @@ public sealed class BackupFileService : IBackupFileService
     {
         OnProgressEvent(new ProgressEventArgs(message));
     }
-        
+
     private void ProgressMessage(string logMessage)
     {
         Log.Logger.Information(logMessage);

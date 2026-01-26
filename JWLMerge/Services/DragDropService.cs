@@ -36,7 +36,7 @@ internal sealed class DragDropService : IDragDropService
     public IEnumerable<string> GetDroppedFiles(DragEventArgs e)
     {
         var result = new List<string>();
-            
+
         if (e.Data is DataObject dataObject && dataObject.ContainsFileDropList())
         {
             foreach (var filePath in dataObject.GetFileDropList())

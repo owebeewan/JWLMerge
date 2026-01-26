@@ -8,11 +8,11 @@ namespace JWLMerge.Helpers;
 internal static class DesignTimeFileCreation
 {
     public static JwLibraryFile CreateMockJwLibraryFile(
-        IBackupFileService backupFileService, 
+        IBackupFileService backupFileService,
         int fileIndex)
     {
         var file = backupFileService.CreateBlank();
-            
+
         file.Manifest.Name = $"File {fileIndex + 1}";
         file.Manifest.CreationDate = GenerateDateString(DateTime.Now.AddDays(-fileIndex));
         file.Manifest.UserDataBackup = new UserDataBackup
@@ -26,5 +26,5 @@ internal static class DesignTimeFileCreation
     private static string GenerateDateString(DateTime dateTime)
     {
         return $"{dateTime.Year}-{dateTime.Month:D2}-{dateTime.Day:D2}";
-    } 
+    }
 }

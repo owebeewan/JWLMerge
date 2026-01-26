@@ -43,7 +43,7 @@ in the note.";
 
         var sections = file.GetPubSymbolsAndLanguages();
         Assert.HasCount(2, sections);
-        
+
         Assert.AreEqual("nwtsty", sections[0].PubSymbol);
         Assert.AreEqual(0, sections[0].LanguageId);
 
@@ -74,7 +74,7 @@ in the note.";
     public void TestImport1()
     {
         const int numRecords = 100;
-            
+
         var file1 = CreateMockBackup(numRecords);
         var notes = CreateMockBibleNotes().ToArray();
         var mockImportOptions = new ImportBibleNotesParams();
@@ -82,8 +82,8 @@ in the note.";
         const int mepsLanguageId = 0;
 
         var importer = new NotesImporter(
-            file1.Database, 
-            "nwtsty", 
+            file1.Database,
+            "nwtsty",
             mepsLanguageId,
             mockImportOptions);
 

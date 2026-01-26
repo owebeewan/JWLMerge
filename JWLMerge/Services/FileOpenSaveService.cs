@@ -86,14 +86,14 @@ internal sealed class FileOpenSaveService : IFileOpenSaveService
             InitialDirectory = Properties.Settings.Default.SaveDirectory ?? GetDefaultSaveFolder(),
             FileName = $"UserdataBackup_{DateTime.Now:yyyy-MM-dd}_JWLMerge",
         };
-            
+
         if (saveFileDialog.ShowDialog() == true)
         {
             Properties.Settings.Default.SaveDirectory = Path.GetDirectoryName(saveFileDialog.FileName);
             Properties.Settings.Default.Save();
             return saveFileDialog.FileName;
         }
-            
+
         return null;
     }
 

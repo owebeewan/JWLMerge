@@ -17,7 +17,7 @@ internal sealed class WindowService : IWindowService
     }
 
     public void ShowDetailWindow(
-        IBackupFileService backupFileService, 
+        IBackupFileService backupFileService,
         string filePath,
         bool notesRedacted)
     {
@@ -29,7 +29,7 @@ internal sealed class WindowService : IWindowService
         else
         {
             var window = CreateDetailWindow(backupFileService, filePath, notesRedacted);
-                
+
             var viewModel = (DetailViewModel)window.DataContext;
             viewModel.SelectedDataType = viewModel.ListItems.FirstOrDefault();
             window.Show();
@@ -51,7 +51,7 @@ internal sealed class WindowService : IWindowService
     }
 
     private DetailWindow CreateDetailWindow(
-        IBackupFileService backupFileService, 
+        IBackupFileService backupFileService,
         string filePath,
         bool notesRedacted)
     {

@@ -17,7 +17,7 @@ public static class Program
     public static void Main(string[] args)
     {
         ConfigureLogging();
-            
+
         try
         {
             Log.Logger.Information("Started");
@@ -40,7 +40,7 @@ public static class Program
         catch (Exception ex)
         {
             Log.Logger.Error(ex, "Error");
-                
+
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(ex.Message);
             Console.ResetColor();
@@ -81,7 +81,7 @@ public static class Program
         Console.WriteLine($@" JWLMergeCLI version {GetVersion()} ");
         Console.WriteLine();
         Console.ResetColor();
-            
+
         Console.ForegroundColor = ConsoleColor.Gray;
         Console.WriteLine(@"   Description:");
         Console.ResetColor();
@@ -89,7 +89,7 @@ public static class Program
         Console.WriteLine(@"    files. These files are produced by the JW Library backup command and");
         Console.WriteLine(@"    contain your personal study notes and highlighting.");
         Console.WriteLine();
-            
+
         Console.ForegroundColor = ConsoleColor.Gray;
         Console.WriteLine(@"   Usage:");
         Console.ResetColor();

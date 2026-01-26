@@ -15,12 +15,12 @@ public class TestMerge : TestBase
 
         var files = Enumerable.Range(1, numFilesToMerge).Select(_ => CreateMockBackup(numRecords))?.ToArray();
         Assert.IsNotNull(files);
-            
+
         var merger = new Merger();
         var mergedDatabase = merger.Merge(files.Select(x => x.Database));
-            
+
         mergedDatabase.CheckValidity();
-        
+
         Assert.HasCount(numRecords * numFilesToMerge, mergedDatabase.UserMarks);
         Assert.IsGreaterThan(numRecords, mergedDatabase.Locations.Count);
         Assert.HasCount(numRecords * numFilesToMerge, mergedDatabase.Notes);

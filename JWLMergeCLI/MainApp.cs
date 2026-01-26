@@ -12,7 +12,7 @@ namespace JWLMergeCLI;
 internal sealed class MainApp
 {
     public event EventHandler<ProgressEventArgs>? ProgressEvent;
-        
+
     /// <summary>
     /// Runs the app.
     /// </summary>

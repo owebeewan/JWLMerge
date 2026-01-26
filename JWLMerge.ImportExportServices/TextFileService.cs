@@ -13,8 +13,8 @@ public class TextFileService : IExportToFileService
     /// <param name="backupFilePath">Path to backup file.</param>
     /// <returns>Results.</returns>
     public ExportBibleNotesResult Execute(
-        string exportFilePath, 
-        IReadOnlyCollection<BibleNoteForImportExport>? notes, 
+        string exportFilePath,
+        IReadOnlyCollection<BibleNoteForImportExport>? notes,
         string backupFilePath)
     {
         var result = new ExportBibleNotesResult();
@@ -48,7 +48,7 @@ public class TextFileService : IExportToFileService
             {
                 writer.WriteLine();
             }
-                
+
             writer.WriteLine($"[BibleKeySymbol={pubSymbol}]");
             writer.WriteLine($"[MepsLanguageId={languageId}]");
 
@@ -70,7 +70,7 @@ public class TextFileService : IExportToFileService
                 // WORD2 = the 0 - based index of the last token in the verse to which the note applies.
                 // COL = the colour index to use.
 
-                writer.WriteLine(item is {StartTokenInVerse: 0, EndTokenInVerse: 0, ColorCode: 0}
+                writer.WriteLine(item is { StartTokenInVerse: 0, EndTokenInVerse: 0, ColorCode: 0 }
                     ? $"[{item.BookNumber}:{item.ChapterNumber ?? 0}:{item.VerseNumber ?? 0}]"
                     : $"[{item.BookNumber}:{item.ChapterNumber ?? 0}:{item.VerseNumber ?? 0}:{item.StartTokenInVerse ?? 0}:{item.EndTokenInVerse ?? 0}:{item.ColorCode ?? 0}]");
 

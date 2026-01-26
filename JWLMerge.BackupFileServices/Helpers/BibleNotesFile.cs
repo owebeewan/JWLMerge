@@ -33,7 +33,7 @@ public class BibleNotesFile
 
     public PubSymbolAndLanguage[] GetPubSymbolsAndLanguages()
         => _sections.Value.Select(x => x.SymbolAndLanguage).ToArray();
-    
+
     public IEnumerable<BibleNote> GetNotes(PubSymbolAndLanguage symbolAndLanguage)
     {
         var sections = _sections.Value.Where(x => x.SymbolAndLanguage == symbolAndLanguage).ToArray();
@@ -77,11 +77,11 @@ public class BibleNotesFile
             {
                 result.Add(currentSection);
             }
-            
+
             var equalsPos = pubSymbolLine.IndexOf('=', BibleKeySymbolToken.Length);
             if (equalsPos < 0)
             {
-                throw new BackupFileServicesException($"Could not find Publication Key Symbol in line {n+1}");
+                throw new BackupFileServicesException($"Could not find Publication Key Symbol in line {n + 1}");
             }
 
             var pubSymbol = pubSymbolLine[(equalsPos + 1)..].TrimEnd(']').Trim().Trim('"');
@@ -201,12 +201,12 @@ public class BibleNotesFile
         {
             return null;
         }
-            
+
         return new BibleNote
         {
             BookChapterAndVerse = new BibleBookChapterAndVerse(
-                currentVerseSpec.BookNumber, 
-                currentVerseSpec.ChapterNumber, 
+                currentVerseSpec.BookNumber,
+                currentVerseSpec.ChapterNumber,
                 currentVerseSpec.VerseNumber),
 
             NoteTitle = titleAndContent.Title?.Trim(),
@@ -278,10 +278,10 @@ public class BibleNotesFile
             VerseNumber = verse,
         };
 
-        if (digits.Length > 4 && 
-            int.TryParse(digits[3], out var startWord) && 
-            int.TryParse(digits[4], out var endWord) && 
-            endWord >= startWord && 
+        if (digits.Length > 4 &&
+            int.TryParse(digits[3], out var startWord) &&
+            int.TryParse(digits[4], out var endWord) &&
+            endWord >= startWord &&
             startWord >= 0 && (startWord != 0 || endWord != 0))
         {
             result.StartWordIndex = startWord;

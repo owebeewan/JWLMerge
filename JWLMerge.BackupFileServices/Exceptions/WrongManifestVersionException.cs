@@ -18,12 +18,12 @@ public class WrongManifestVersionException : BackupFileServicesException
     {
     }
 
-    public WrongManifestVersionException(string errorMessage) 
+    public WrongManifestVersionException(string errorMessage)
         : base(errorMessage)
     {
     }
 
-    public WrongManifestVersionException(string message, Exception innerException) 
+    public WrongManifestVersionException(string message, Exception innerException)
         : base(message, innerException)
     {
     }

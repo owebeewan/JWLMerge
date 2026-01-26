@@ -10,7 +10,7 @@ namespace JWLMerge.Tests;
 public class TestBase
 {
     private readonly Random _random = new();
-        
+
     protected BackupFile CreateMockBackup(int numRecords = 100)
     {
         return new(CreateMockManifest(), CreateMockDatabase(numRecords), "test.jwlibrary");
@@ -67,14 +67,14 @@ public class TestBase
                 Identifier = 8,
             });
         }
-            
+
         return result;
     }
 
     private List<Note> CreateMockNotes(int numRecords)
     {
         var result = new List<Note>();
-            
+
         for (int n = 1; n <= numRecords; ++n)
         {
             result.Add(new Note

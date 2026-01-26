@@ -17,7 +17,7 @@ internal sealed class JwLibraryFile : ObservableObject
     }
 
     public string FilePath { get; }
-    
+
     public BackupFile BackupFile { get; set; }
 
     public MergeParameters MergeParameters { get; }

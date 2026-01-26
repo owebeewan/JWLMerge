@@ -14,16 +14,16 @@ public class WrongDatabaseVersionException : BackupFileServicesException
         FoundVersion = foundVersion;
     }
 
-    public WrongDatabaseVersionException() 
+    public WrongDatabaseVersionException()
     {
     }
 
-    public WrongDatabaseVersionException(string errorMessage) 
+    public WrongDatabaseVersionException(string errorMessage)
         : base(errorMessage)
     {
     }
 
-    public WrongDatabaseVersionException(string message, Exception innerException) 
+    public WrongDatabaseVersionException(string message, Exception innerException)
         : base(message, innerException)
     {
     }

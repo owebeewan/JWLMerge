@@ -82,7 +82,7 @@ internal sealed class DialogService : IDialogService
         var dc = (RedactNotesPromptViewModel)dialog.DataContext;
 
         await DialogHost.Show(
-            dialog, 
+            dialog,
             "MainDialogHost",
             (object _, DialogClosingEventArgs _) => _isDialogVisible = false).ConfigureAwait(false);
 

@@ -40,7 +40,7 @@ internal sealed class ImportBibleNotesViewModel : ObservableObject
     private void Cancel()
     {
         Result = null;
-        
+
         DialogHost.CloseDialogCommand.Execute(null, null);
     }
 

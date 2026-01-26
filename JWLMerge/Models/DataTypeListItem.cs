@@ -7,8 +7,8 @@ internal sealed class DataTypeListItem
         Caption = caption;
         DataType = dataType;
     }
-        
+
     public string Caption { get; }
-        
+
     public JwLibraryFileDataTypes DataType { get; }
 }

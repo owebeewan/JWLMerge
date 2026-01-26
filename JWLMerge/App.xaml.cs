@@ -63,7 +63,7 @@ public partial class App : IDisposable
             // disable hardware (GPU) rendering so that it's all done by the CPU...
             RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
         }
-                        
+
         Current.DispatcherUnhandledException += CurrentDispatcherUnhandledException;
     }
 
@@ -102,9 +102,9 @@ public partial class App : IDisposable
         serviceCollection.AddSingleton<RemoveNotesByTagViewModel>();
         serviceCollection.AddSingleton<RemoveUnderliningByColourViewModel>();
         serviceCollection.AddSingleton<RemoveUnderliningByPubAndColourViewModel>();
-        serviceCollection.AddSingleton<ImportBibleNotesViewModel >();
+        serviceCollection.AddSingleton<ImportBibleNotesViewModel>();
         serviceCollection.AddTransient<DetailViewModel>();
-            
+
         var serviceProvider = serviceCollection.BuildServiceProvider();
         Ioc.Default.ConfigureServices(serviceProvider);
     }

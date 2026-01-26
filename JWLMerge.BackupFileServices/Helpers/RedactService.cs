@@ -17,7 +17,7 @@ internal sealed class RedactService
     {
         return GenerateText(length);
     }
-        
+
     public string GenerateNoteContent(int length)
     {
         return GenerateText(length);
@@ -36,7 +36,7 @@ internal sealed class RedactService
 
             sb.Append(GetRandomSentence());
         }
-            
+
         return sb.ToString()[..length];
     }
 

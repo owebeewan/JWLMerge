@@ -46,8 +46,8 @@ internal sealed class RemoveNotesByTagViewModel : ObservableObject
         set => SetProperty(ref _removeAssociatedTags, value);
     }
 
-    public string RemoveTagsCaption => NumTagsSelectedExcludingFirst() > 1 
-        ? "Remove associated Tags" 
+    public string RemoveTagsCaption => NumTagsSelectedExcludingFirst() > 1
+        ? "Remove associated Tags"
         : "Remove associated Tag";
 
     private void TagItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

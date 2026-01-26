@@ -15,8 +15,8 @@ internal sealed class DetailViewModel : ObservableObject
     private bool _notesRedacted;
     private string? _windowTitle;
     private BackupFile? _backupFile;
-        
-    public DetailViewModel() 
+
+    public DetailViewModel()
     {
         ListItems = CreateListItems();
     }

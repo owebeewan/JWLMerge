@@ -10,10 +10,10 @@ public class TestCleaner : TestBase
     public void TestAllClean()
     {
         var file = CreateMockBackup();
-            
+
         var cleaner = new Cleaner(file.Database);
         var removedRows = cleaner.Clean();
-            
+
         Assert.AreEqual(0, removedRows);
     }
 }

@@ -21,8 +21,8 @@ internal sealed class NotesImporter
     private int _tagMapPositionToUse;
 
     public NotesImporter(
-        Database targetDatabase, 
-        string bibleKeySymbol, 
+        Database targetDatabase,
+        string bibleKeySymbol,
         int? mepsLanguageId,
         ImportBibleNotesParams options)
     {
@@ -32,7 +32,7 @@ internal sealed class NotesImporter
         _options = options;
 
         _maxNoteId = _targetDatabase.Notes.Count == 0
-            ? 0 
+            ? 0
             : _targetDatabase.Notes.Max(x => x.NoteId);
 
         _maxTagMapId = _targetDatabase.TagMaps.Count == 0
@@ -64,7 +64,7 @@ internal sealed class NotesImporter
     public NotesImportResults Import(IEnumerable<BibleNote> notes)
     {
         var result = new NotesImportResults();
-            
+
         foreach (var note in notes)
         {
             var existingNote = FindExistingNote(_targetDatabase, note);
@@ -87,7 +87,7 @@ internal sealed class NotesImporter
                 }
             }
         }
-            
+
         _targetDatabase.CheckValidity();
 
         return result;
@@ -108,7 +108,7 @@ internal sealed class NotesImporter
         var book = note.BookChapterAndVerse.BookNumber;
         var chapter = note.BookChapterAndVerse.ChapterNumber;
 
-        var location = _targetDatabase.FindLocationByBibleChapter(_bibleKeySymbol, book, chapter) ?? 
+        var location = _targetDatabase.FindLocationByBibleChapter(_bibleKeySymbol, book, chapter) ??
                        InsertLocation(book, chapter);
 
         UserMark? userMark = null;
@@ -117,13 +117,13 @@ internal sealed class NotesImporter
             // the note should be associated with some
             // highlighted text in the verse.
             userMark = FindExistingUserMark(
-                           location.LocationId, 
+                           location.LocationId,
                            note.StartTokenInVerse.Value,
                            note.EndTokenInVerse.Value) ??
                        InsertUserMark(
-                           location.LocationId, 
-                           note.ColourIndex, 
-                           note.StartTokenInVerse.Value, 
+                           location.LocationId,
+                           note.ColourIndex,
+                           note.StartTokenInVerse.Value,
                            note.EndTokenInVerse.Value,
                            note.BookChapterAndVerse.VerseNumber);
         }
@@ -146,8 +146,8 @@ internal sealed class NotesImporter
             : CreateTagMapEntryForImportedBibleNote(newNote.NoteId, _options.TagId, _tagMapPositionToUse++);
 
         _targetDatabase.AddBibleNoteAndUpdateIndex(
-            note.BookChapterAndVerse, 
-            newNote, 
+            note.BookChapterAndVerse,
+            newNote,
             newTagMapEntry);
     }
 
@@ -163,10 +163,10 @@ internal sealed class NotesImporter
     }
 
     private UserMark InsertUserMark(
-        int locationId, 
-        int colourIndex, 
-        int startToken, 
-        int endToken, 
+        int locationId,
+        int colourIndex,
+        int startToken,
+        int endToken,
         int verseNumber)
     {
         var userMark = new UserMark

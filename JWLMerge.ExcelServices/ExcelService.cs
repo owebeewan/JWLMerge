@@ -21,7 +21,7 @@ public class ExcelService : IExportToFileService
     /// <param name="backupFilePath">Path to backup file.</param>
     /// <returns>Results.</returns>
     public ExportBibleNotesResult Execute(
-        string exportFilePath, 
+        string exportFilePath,
         IReadOnlyCollection<BibleNoteForImportExport>? notes,
         string backupFilePath)
     {
@@ -60,7 +60,7 @@ public class ExcelService : IExportToFileService
             {
                 result.SomeNotesTooLarge = true;
             }
-                
+
             var noteContent = noteTooLarge
                 ? note.NoteContent![..short.MaxValue]
                 : note.NoteContent;

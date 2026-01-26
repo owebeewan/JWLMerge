@@ -8,11 +8,11 @@ internal static class MergePreparation
 {
     public static int ApplyMergeParameters(
         IBackupFileService backupFileService,
-        Database database, 
+        Database database,
         MergeParameters fileMergeParameters)
     {
         int changeCount = 0;
-            
+
         if (!fileMergeParameters.IncludeTags)
         {
             changeCount += backupFileService.RemoveTags(database);
