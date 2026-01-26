@@ -18,16 +18,6 @@ public class WrongManifestVersionException : BackupFileServicesException
     {
     }
 
-    public WrongManifestVersionException(string errorMessage)
-        : base(errorMessage)
-    {
-    }
-
-    public WrongManifestVersionException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
-
     // Without this constructor, deserialization will fail
     protected WrongManifestVersionException(SerializationInfo info, StreamingContext context)
         : base(info, context)
