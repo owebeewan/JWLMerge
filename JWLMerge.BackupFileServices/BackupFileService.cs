@@ -186,12 +186,13 @@ public sealed class BackupFileService : IBackupFileService
         ArgumentNullException.ThrowIfNull(backup);
 
         colorIndexes ??= [];
+        var colorIndexSet = colorIndexes.ToHashSet();
 
         var userMarkIdsToRemove = new HashSet<int>();
 
         foreach (var mark in backup.Database.UserMarks)
         {
-            if (colorIndexes.Contains(mark.ColorIndex))
+            if (colorIndexSet.Contains(mark.ColorIndex))
             {
                 userMarkIdsToRemove.Add(mark.UserMarkId);
             }
@@ -367,11 +368,12 @@ public sealed class BackupFileService : IBackupFileService
         }
 
         var countRemoved = 0;
-        foreach (var userMark in Enumerable.Reverse(database.UserMarks))
+        for (var index = database.UserMarks.Count - 1; index >= 0; --index)
         {
+            var userMark = database.UserMarks[index];
             if (!userMarksToRetain.Contains(userMark.UserMarkId))
             {
-                database.UserMarks.Remove(userMark);
+                database.UserMarks.RemoveAt(index);
                 ++countRemoved;
             }
         }
@@ -483,7 +485,7 @@ public sealed class BackupFileService : IBackupFileService
     private static void RemoveSelectedTags(Database database, HashSet<int> tagIds)
     {
         database.Tags.RemoveAll(x => tagIds.Contains(x.TagId));
-        database.TagMaps.RemoveAll(x => tagIds.Contains(x.TagMapId));
+        database.TagMaps.RemoveAll(x => tagIds.Contains(x.TagId));
     }
 
     private static bool SupportDatabaseVersion(int version) => version <= DatabaseVersionSupported;
@@ -817,7 +819,7 @@ public sealed class BackupFileService : IBackupFileService
 
         ProgressMessage($"Adding independent media to archive");
 
-        var fileTracker = new List<string>();
+        var fileTracker = new HashSet<string>(StringComparer.Ordinal);
         foreach (var file in sourceFiles)
         {
             using var sourceFileStream = File.OpenRead(file);

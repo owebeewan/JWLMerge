@@ -779,14 +779,11 @@ internal sealed class MainViewModel : ObservableObject
             return;
         }
 
-        foreach (var file in Files)
+        var file = Files.FirstOrDefault(x => IsSameFile(x.FilePath, filePath));
+        if (file != null)
         {
-            if (IsSameFile(file.FilePath, filePath))
-            {
-                Files.Remove(file);
-                _windowService.Close(filePath);
-                break;
-            }
+            Files.Remove(file);
+            _windowService.Close(filePath);
         }
     }
 
@@ -930,8 +927,11 @@ internal sealed class MainViewModel : ObservableObject
                 if (latestVersion != null && VersionDetection.GetCurrentVersion().CompareTo(latestVersion) < 0)
                 {
                     // there is a new version....
-                    IsNewVersionAvailable = true;
-                    OnPropertyChanged(nameof(IsNewVersionAvailable));
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        IsNewVersionAvailable = true;
+                        OnPropertyChanged(nameof(IsNewVersionAvailable));
+                    }));
                 }
             });
         }

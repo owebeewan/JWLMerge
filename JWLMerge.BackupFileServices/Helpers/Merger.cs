@@ -115,20 +115,30 @@ internal sealed class Merger
     /// <param name="destination">The destination database to check</param>
     private static void PlaylistItemsCleanup(Database destination)
     {
+        var playlistItemIdsWithIndependentMedia = destination.PlaylistItemIndependentMediaMaps
+            .Select(mm => mm.PlaylistItemId)
+            .ToHashSet();
+        var playlistItemIdsWithLocations = destination.PlaylistItemLocationMaps
+            .Select(lm => lm.PlaylistItemId)
+            .ToHashSet();
+        var playlistItemIdsWithMarkers = destination.PlaylistItemMarkers
+            .Select(marker => marker.PlaylistItemId)
+            .ToHashSet();
+
         var itemsToRemove = new List<PlaylistItem>();
         foreach (var playlistItem in destination.PlaylistItems)
         {
-            if (destination.PlaylistItemIndependentMediaMaps.Any(mm => mm.PlaylistItemId == playlistItem.PlaylistItemId))
+            if (playlistItemIdsWithIndependentMedia.Contains(playlistItem.PlaylistItemId))
             {
                 continue;
             }
 
-            if (destination.PlaylistItemLocationMaps.Any(lm => lm.PlaylistItemId == playlistItem.PlaylistItemId))
+            if (playlistItemIdsWithLocations.Contains(playlistItem.PlaylistItemId))
             {
                 continue;
             }
 
-            if (destination.PlaylistItemMarkers.Any(m => m.PlaylistItemId != playlistItem.PlaylistItemId))
+            if (playlistItemIdsWithMarkers.Contains(playlistItem.PlaylistItemId))
             {
                 continue;
             }
@@ -139,11 +149,7 @@ internal sealed class Merger
         foreach (var item in itemsToRemove)
         {
             // Remove from tag maps as well
-            var tagMap = destination.TagMaps.FirstOrDefault(tm => tm.PlaylistItemId == item.PlaylistItemId);
-            if (tagMap != null)
-            {
-                destination.TagMaps.Remove(tagMap);
-            }
+            destination.TagMaps.RemoveAll(tm => tm.PlaylistItemId == item.PlaylistItemId);
 
             destination.PlaylistItems.Remove(item);
         }
