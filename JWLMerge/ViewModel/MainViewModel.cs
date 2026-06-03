@@ -925,7 +925,7 @@ internal sealed class MainViewModel : ObservableObject
             {
                 await Task.Delay(2000).ConfigureAwait(true);
 
-                var latestVersion = VersionDetection.GetLatestReleaseVersion(_latestReleaseUrl);
+                var latestVersion = await Task.Run(() => VersionDetection.GetLatestReleaseVersion(_latestReleaseUrl)).ConfigureAwait(true);
                 if (latestVersion != null && VersionDetection.GetCurrentVersion().CompareTo(latestVersion) < 0)
                 {
                     // there is a new version....
