@@ -24,7 +24,7 @@ namespace JWLMerge.BackupFileServices;
 public sealed class BackupFileService : IBackupFileService
 {
     private const int ManifestVersionSupported = 1;
-    private const int DatabaseVersionSupported = 14;
+    private const int DatabaseVersionSupported = 16;
     private const string ManifestEntryName = "manifest.json";
     private const string DatabaseEntryName = "userData.db";
     private const string DefaultThumb = "default_thumbnail.png";
@@ -486,7 +486,7 @@ public sealed class BackupFileService : IBackupFileService
         database.TagMaps.RemoveAll(x => tagIds.Contains(x.TagMapId));
     }
 
-    private static bool SupportDatabaseVersion(int version) => version == DatabaseVersionSupported;
+    private static bool SupportDatabaseVersion(int version) => version <= DatabaseVersionSupported;
 
     private static bool SupportManifestVersion(int version) => version == ManifestVersionSupported;
 

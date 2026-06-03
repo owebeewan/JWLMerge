@@ -59,5 +59,15 @@ public class Location
     /// </summary>
     public string? Title { get; set; }
 
+    /// <summary>
+    /// The specialty (nullable). Added in database schema version 16.
+    /// </summary>
+    public string? Specialty { get; set; }
+
+    /// <summary>
+    /// The edition (nullable). Added in database schema version 16.
+    /// </summary>
+    public string? Edition { get; set; }
+
     public Location Clone() => (Location)MemberwiseClone();
 }
