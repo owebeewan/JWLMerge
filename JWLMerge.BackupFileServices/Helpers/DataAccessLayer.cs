@@ -273,6 +273,8 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             MepsLanguage = ReadNullableInt(reader, "MepsLanguage"),
             Type = ReadInt(reader, "Type"),
             Title = ReadNullableString(reader, "Title"),
+            Specialty = ReadNullableString(reader, "Specialty"),
+            Edition = ReadNullableString(reader, "Edition"),
         };
 
     private Note ReadNote(SqliteDataReader reader)
