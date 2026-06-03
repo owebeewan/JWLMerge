@@ -649,7 +649,20 @@ internal sealed class MainViewModel : ObservableObject
     private void BrowseForFiles()
     {
         var files = _fileOpenSaveService.GetOpenFiles("Select one or more JW Library backup files");
-        AddFiles(files);
+        try
+        {
+            AddFiles(files);
+        }
+        catch (AggregateException ex)
+        {
+            Log.Logger.Information(ex, "Unable to accept file");
+            _dialogService.ShowFileFormatErrorsAsync(ex);
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, "Unexpected error");
+            EventTracker.Error(ex, "Opening file");
+        }
     }
 
     private void PrepareForMerge()
