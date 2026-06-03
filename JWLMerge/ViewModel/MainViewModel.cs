@@ -68,7 +68,7 @@ internal sealed class MainViewModel : ObservableObject
 
         InitCommands();
 
-        GetVersionData();
+        _ = GetVersionDataAsync();
     }
 
     public ObservableCollection<JwLibraryFile> Files { get; } = new();
@@ -912,7 +912,7 @@ internal sealed class MainViewModel : ObservableObject
         return count == 1 ? 0 : count;
     }
 
-    private void GetVersionData()
+    private async Task GetVersionDataAsync()
     {
         if (IsInDesignMode())
         {
@@ -921,19 +921,22 @@ internal sealed class MainViewModel : ObservableObject
         }
         else
         {
-            Task.Delay(2000).ContinueWith(_ =>
+            try
             {
+                await Task.Delay(2000).ConfigureAwait(true);
+
                 var latestVersion = VersionDetection.GetLatestReleaseVersion(_latestReleaseUrl);
                 if (latestVersion != null && VersionDetection.GetCurrentVersion().CompareTo(latestVersion) < 0)
                 {
                     // there is a new version....
-                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        IsNewVersionAvailable = true;
-                        OnPropertyChanged(nameof(IsNewVersionAvailable));
-                    }));
+                    IsNewVersionAvailable = true;
+                    OnPropertyChanged(nameof(IsNewVersionAvailable));
                 }
-            });
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Warning(ex, "Could not retrieve latest version information");
+            }
         }
     }
 

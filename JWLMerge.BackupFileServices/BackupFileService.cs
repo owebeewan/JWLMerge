@@ -812,7 +812,13 @@ public sealed class BackupFileService : IBackupFileService
 
     private void AddMediaToArchive(ZipArchive archive, IEnumerable<string> sourceFiles, IList<IndependentMedia> independentMedias)
     {
-        if (!sourceFiles.Any() || !independentMedias.Any())
+        if (!independentMedias.Any())
+        {
+            return;
+        }
+
+        var sourceFilesList = sourceFiles as IReadOnlyCollection<string> ?? sourceFiles.ToList();
+        if (sourceFilesList.Count == 0)
         {
             return;
         }
@@ -820,7 +826,7 @@ public sealed class BackupFileService : IBackupFileService
         ProgressMessage($"Adding independent media to archive");
 
         var fileTracker = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var file in sourceFiles)
+        foreach (var file in sourceFilesList)
         {
             using var sourceFileStream = File.OpenRead(file);
             using var sourceArchive = new ZipArchive(sourceFileStream, ZipArchiveMode.Read);

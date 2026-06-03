@@ -125,34 +125,22 @@ internal sealed class Merger
             .Select(marker => marker.PlaylistItemId)
             .ToHashSet();
 
-        var itemsToRemove = new List<PlaylistItem>();
-        foreach (var playlistItem in destination.PlaylistItems)
+        var playlistItemIdsToRemove = destination.PlaylistItems
+            .Where(playlistItem =>
+                !playlistItemIdsWithIndependentMedia.Contains(playlistItem.PlaylistItemId)
+                && !playlistItemIdsWithLocations.Contains(playlistItem.PlaylistItemId)
+                && !playlistItemIdsWithMarkers.Contains(playlistItem.PlaylistItemId))
+            .Select(playlistItem => playlistItem.PlaylistItemId)
+            .ToHashSet();
+
+        if (playlistItemIdsToRemove.Count == 0)
         {
-            if (playlistItemIdsWithIndependentMedia.Contains(playlistItem.PlaylistItemId))
-            {
-                continue;
-            }
-
-            if (playlistItemIdsWithLocations.Contains(playlistItem.PlaylistItemId))
-            {
-                continue;
-            }
-
-            if (playlistItemIdsWithMarkers.Contains(playlistItem.PlaylistItemId))
-            {
-                continue;
-            }
-
-            itemsToRemove.Add(playlistItem);
+            return;
         }
 
-        foreach (var item in itemsToRemove)
-        {
-            // Remove from tag maps as well
-            destination.TagMaps.RemoveAll(tm => tm.PlaylistItemId == item.PlaylistItemId);
-
-            destination.PlaylistItems.Remove(item);
-        }
+        // Remove from tag maps as well.
+        destination.TagMaps.RemoveAll(tm => tm.PlaylistItemId != null && playlistItemIdsToRemove.Contains(tm.PlaylistItemId.Value));
+        destination.PlaylistItems.RemoveAll(item => playlistItemIdsToRemove.Contains(item.PlaylistItemId));
     }
 
     private void MergeBookmarks(Database source, Database destination)
