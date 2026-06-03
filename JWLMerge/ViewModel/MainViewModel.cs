@@ -13,6 +13,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using JWLMerge.BackupFileServices.Helpers;
 using JWLMerge.BackupFileServices;
+using JWLMerge.BackupFileServices.Exceptions;
 using MaterialDesignThemes.Wpf;
 using Serilog;
 using JWLMerge.EventTracking;
@@ -653,15 +654,10 @@ internal sealed class MainViewModel : ObservableObject
         {
             AddFiles(files);
         }
-        catch (AggregateException ex)
+        catch (AggregateException ex) when (ex.InnerExceptions.Any(e => e is WrongDatabaseVersionException))
         {
-            Log.Logger.Information(ex, "Unable to accept file");
+            Log.Logger.Information(ex, "Database version mismatch");
             _dialogService.ShowFileFormatErrorsAsync(ex);
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Error(ex, "Unexpected error");
-            EventTracker.Error(ex, "Opening file");
         }
     }
 
