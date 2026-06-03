@@ -74,7 +74,7 @@ public class TextFileService : IExportToFileService
                     ? $"[{item.BookNumber}:{item.ChapterNumber ?? 0}:{item.VerseNumber ?? 0}]"
                     : $"[{item.BookNumber}:{item.ChapterNumber ?? 0}:{item.VerseNumber ?? 0}:{item.StartTokenInVerse ?? 0}:{item.EndTokenInVerse ?? 0}:{item.ColorCode ?? 0}]");
 
-                if (string.IsNullOrWhiteSpace(item.NoteTitle))
+                if (!string.IsNullOrWhiteSpace(item.NoteTitle))
                 {
                     writer.WriteLine(item.NoteTitle);
                 }
