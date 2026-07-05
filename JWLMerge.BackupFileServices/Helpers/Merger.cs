@@ -115,38 +115,32 @@ internal sealed class Merger
     /// <param name="destination">The destination database to check</param>
     private static void PlaylistItemsCleanup(Database destination)
     {
-        var itemsToRemove = new List<PlaylistItem>();
-        foreach (var playlistItem in destination.PlaylistItems)
+        var playlistItemIdsWithIndependentMedia = destination.PlaylistItemIndependentMediaMaps
+            .Select(mm => mm.PlaylistItemId)
+            .ToHashSet();
+        var playlistItemIdsWithLocations = destination.PlaylistItemLocationMaps
+            .Select(lm => lm.PlaylistItemId)
+            .ToHashSet();
+        var playlistItemIdsWithMarkers = destination.PlaylistItemMarkers
+            .Select(marker => marker.PlaylistItemId)
+            .ToHashSet();
+
+        var playlistItemIdsToRemove = destination.PlaylistItems
+            .Where(playlistItem =>
+                !playlistItemIdsWithIndependentMedia.Contains(playlistItem.PlaylistItemId)
+                && !playlistItemIdsWithLocations.Contains(playlistItem.PlaylistItemId)
+                && !playlistItemIdsWithMarkers.Contains(playlistItem.PlaylistItemId))
+            .Select(playlistItem => playlistItem.PlaylistItemId)
+            .ToHashSet();
+
+        if (playlistItemIdsToRemove.Count == 0)
         {
-            if (destination.PlaylistItemIndependentMediaMaps.Any(mm => mm.PlaylistItemId == playlistItem.PlaylistItemId))
-            {
-                continue;
-            }
-
-            if (destination.PlaylistItemLocationMaps.Any(lm => lm.PlaylistItemId == playlistItem.PlaylistItemId))
-            {
-                continue;
-            }
-
-            if (destination.PlaylistItemMarkers.Any(m => m.PlaylistItemId != playlistItem.PlaylistItemId))
-            {
-                continue;
-            }
-
-            itemsToRemove.Add(playlistItem);
+            return;
         }
 
-        foreach (var item in itemsToRemove)
-        {
-            // Remove from tag maps as well
-            var tagMap = destination.TagMaps.FirstOrDefault(tm => tm.PlaylistItemId == item.PlaylistItemId);
-            if (tagMap != null)
-            {
-                destination.TagMaps.Remove(tagMap);
-            }
-
-            destination.PlaylistItems.Remove(item);
-        }
+        // Remove from tag maps as well.
+        destination.TagMaps.RemoveAll(tm => tm.PlaylistItemId != null && playlistItemIdsToRemove.Contains(tm.PlaylistItemId.Value));
+        destination.PlaylistItems.RemoveAll(item => playlistItemIdsToRemove.Contains(item.PlaylistItemId));
     }
 
     private void MergeBookmarks(Database source, Database destination)

@@ -3,6 +3,7 @@ using Microsoft.AppCenter.Crashes;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.ExceptionServices;
 
 namespace JWLMerge.EventTracking;
 
@@ -47,7 +48,7 @@ internal static class EventTracker
             Crashes.TrackError(ex, properties);
         }
 #if DEBUG
-        throw ex;
+        ExceptionDispatchInfo.Capture(ex).Throw();
 #endif
     }
 

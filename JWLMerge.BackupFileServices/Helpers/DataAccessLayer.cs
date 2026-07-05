@@ -3,6 +3,7 @@ using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using JWLMerge.BackupFileServices.Models.DatabaseModels;
 using Serilog;
 
@@ -279,12 +280,21 @@ internal sealed class DataAccessLayer(string databaseFilePath)
     private static void PopulateTable<TRowType>(SqliteConnection connection, List<TRowType> rows)
     {
         var tableName = typeof(TRowType).Name;
-        var columnNames = GetColumnNames<TRowType>();
+        var properties = typeof(TRowType).GetProperties();
+        var columnNames = properties.Select(property => property.Name).ToList();
         var columnNamesCsv = string.Join(",", columnNames);
         var paramNames = GetParamNames(columnNames);
         var paramNamesCsv = string.Join(",", paramNames);
 
         using var transaction = connection.BeginTransaction();
+        using var cmd = connection.CreateCommand();
+        cmd.CommandText = $"INSERT INTO {tableName} ({columnNamesCsv}) VALUES ({paramNamesCsv})";
+        cmd.Transaction = transaction;
+
+        foreach (var paramName in paramNames)
+        {
+            cmd.Parameters.AddWithValue(paramName, DBNull.Value);
+        }
 
         foreach (var row in rows)
         {
@@ -293,9 +303,7 @@ internal sealed class DataAccessLayer(string databaseFilePath)
                 continue;
             }
 
-            using var cmd = connection.CreateCommand();
-            cmd.CommandText = $"INSERT INTO {tableName} ({columnNamesCsv}) VALUES ({paramNamesCsv})";
-            AddPopulateTableParams(cmd, columnNames, paramNames, row);
+            UpdatePopulateTableParams(cmd, properties, row);
 
             cmd.ExecuteNonQuery();
         }
@@ -303,26 +311,19 @@ internal sealed class DataAccessLayer(string databaseFilePath)
         transaction.Commit();
     }
 
-    private static void AddPopulateTableParams<TRowType>(
+    private static void UpdatePopulateTableParams<TRowType>(
         SqliteCommand cmd,
-        List<string> columnNames,
-        List<string> paramNames,
+        IReadOnlyList<PropertyInfo> properties,
         TRowType row)
     {
-        for (int n = 0; n < columnNames.Count; ++n)
+        for (var n = 0; n < properties.Count; ++n)
         {
-            var value = row!.GetType().GetProperty(columnNames[n])?.GetValue(row) ?? DBNull.Value;
-            cmd.Parameters.AddWithValue(paramNames[n], value);
+            var value = properties[n].GetValue(row) ?? DBNull.Value;
+            cmd.Parameters[n].Value = value;
         }
     }
 
     private static List<string> GetParamNames(IReadOnlyCollection<string> columnNames) => columnNames.Select(columnName => $"@{columnName}").ToList();
-
-    private static List<string> GetColumnNames<TRowType>()
-    {
-        var properties = typeof(TRowType).GetProperties();
-        return properties.Select(property => property.Name).ToList();
-    }
 
     private Location ReadLocation(SqliteDataReader reader)
         => new()
@@ -337,6 +338,8 @@ internal sealed class DataAccessLayer(string databaseFilePath)
             MepsLanguage = ReadNullableInt(reader, "MepsLanguage"),
             Type = ReadInt(reader, "Type"),
             Title = ReadNullableString(reader, "Title"),
+            Specialty = ReadNullableString(reader, "Specialty"),
+            Edition = ReadNullableString(reader, "Edition"),
         };
 
     private Note ReadNote(SqliteDataReader reader)

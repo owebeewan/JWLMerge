@@ -13,6 +13,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using JWLMerge.BackupFileServices.Helpers;
 using JWLMerge.BackupFileServices;
+using JWLMerge.BackupFileServices.Exceptions;
 using MaterialDesignThemes.Wpf;
 using Serilog;
 using JWLMerge.EventTracking;
@@ -67,7 +68,7 @@ internal sealed class MainViewModel : ObservableObject
 
         InitCommands();
 
-        GetVersionData();
+        _ = GetVersionDataAsync();
     }
 
     public ObservableCollection<JwLibraryFile> Files { get; } = new();
@@ -649,7 +650,15 @@ internal sealed class MainViewModel : ObservableObject
     private void BrowseForFiles()
     {
         var files = _fileOpenSaveService.GetOpenFiles("Select one or more JW Library backup files");
-        AddFiles(files);
+        try
+        {
+            AddFiles(files);
+        }
+        catch (AggregateException ex) when (ex.InnerExceptions.Any(e => e is WrongDatabaseVersionException))
+        {
+            Log.Logger.Information(ex, "Database version mismatch");
+            _dialogService.ShowFileFormatErrorsAsync(ex);
+        }
     }
 
     private void PrepareForMerge()
@@ -770,14 +779,11 @@ internal sealed class MainViewModel : ObservableObject
             return;
         }
 
-        foreach (var file in Files)
+        var file = Files.FirstOrDefault(x => IsSameFile(x.FilePath, filePath));
+        if (file != null)
         {
-            if (IsSameFile(file.FilePath, filePath))
-            {
-                Files.Remove(file);
-                _windowService.Close(filePath);
-                break;
-            }
+            Files.Remove(file);
+            _windowService.Close(filePath);
         }
     }
 
@@ -906,7 +912,7 @@ internal sealed class MainViewModel : ObservableObject
         return count == 1 ? 0 : count;
     }
 
-    private void GetVersionData()
+    private async Task GetVersionDataAsync()
     {
         if (IsInDesignMode())
         {
@@ -915,16 +921,22 @@ internal sealed class MainViewModel : ObservableObject
         }
         else
         {
-            Task.Delay(2000).ContinueWith(_ =>
+            try
             {
-                var latestVersion = VersionDetection.GetLatestReleaseVersion(_latestReleaseUrl);
+                await Task.Delay(2000).ConfigureAwait(true);
+
+                var latestVersion = await Task.Run(() => VersionDetection.GetLatestReleaseVersion(_latestReleaseUrl)).ConfigureAwait(true);
                 if (latestVersion != null && VersionDetection.GetCurrentVersion().CompareTo(latestVersion) < 0)
                 {
                     // there is a new version....
                     IsNewVersionAvailable = true;
                     OnPropertyChanged(nameof(IsNewVersionAvailable));
                 }
-            });
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Warning(ex, "Could not retrieve latest version information");
+            }
         }
     }
 

@@ -37,6 +37,7 @@ internal static class ArgsHelper
             {
                 case State.AwaitingOutput:
                     outputFilePath = a;
+                    state = State.Unknown;
                     break;
 
                 case State.Unknown:

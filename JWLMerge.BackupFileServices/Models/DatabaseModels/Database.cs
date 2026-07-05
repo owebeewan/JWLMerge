@@ -528,7 +528,7 @@ public class Database
     private static string GetBookmarkKey(int locationId, int publicationLocationId) => $"{locationId}-{publicationLocationId}";
 
     private static string GetLocationByValueKey(Location location)
-        => $"{location.KeySymbol}|{location.IssueTagNumber}|{location.MepsLanguage}|{location.Type}|{location.BookNumber ?? -1}|{location.ChapterNumber ?? -1}|{location.DocumentId ?? -1}|{location.Track ?? -1}";
+        => $"{location.KeySymbol}|{location.IssueTagNumber}|{location.MepsLanguage}|{location.Type}|{location.BookNumber ?? -1}|{location.ChapterNumber ?? -1}|{location.DocumentId ?? -1}|{location.Track ?? -1}|{location.Specialty ?? string.Empty}|{location.Edition ?? string.Empty}";
 
     private static string GetLocationByBibleChapterKey(int bibleBookNumber, int chapterNumber, string? bibleKeySymbol) => $"{bibleBookNumber}-{chapterNumber}-{bibleKeySymbol ?? string.Empty}";
 
